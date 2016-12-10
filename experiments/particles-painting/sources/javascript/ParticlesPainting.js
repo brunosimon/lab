@@ -1,3 +1,6 @@
+let ParticlesImage = require( './ParticlesImage.js' )
+let Particle       = require( './Particle.js' )
+
 class ParticlesPainting
 {
     constructor( options )
@@ -42,7 +45,8 @@ class ParticlesPainting
 
     reset()
     {
-        this.image.load( this.image.image.src )
+        if( this.image.image )
+            this.image.load( this.image.image.src )
     }
 
     startRandom()
@@ -130,3 +134,5 @@ class ParticlesPainting
         }
     }
 }
+
+module.exports = ParticlesPainting

@@ -36,3 +36,5 @@ class Particle
         this.context.fill()
     }
 }
+
+module.exports = Particle

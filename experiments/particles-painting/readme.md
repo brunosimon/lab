@@ -3,9 +3,9 @@
 ### TODO
 
 - [x] Stats
-- [ ] Builder
+- [x] Builder
 - [x] Tweaker
-- [ ] Custom image
+- [x] Custom image
 - [x] Click reset
 - [x] Update only if tab active
 - [x] Handle resize

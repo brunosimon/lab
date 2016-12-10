@@ -2,6 +2,7 @@
 
 ### Experiments
 
+- [particles-painting](https://bruno-simon.com/lab/experiments/particles-painting/) ([source](experiments/particles-painting/))
 - [css3-boxes](https://bruno-simon.com/lab/experiments/css3-boxes/) ([source](experiments/css3-boxes/))
 - [music-spinners](https://bruno-simon.com/lab/experiments/music-spinners/) ([source](experiments/music-spinners/))
 - [particles-morphing](https://bruno-simon.com/lab/experiments/particles-morphing/) ([source](experiments/particles-morphing/))
@@ -16,9 +17,8 @@
 
 ### Work in progress
 
-- [attracters](https://bruno-simon.com/lab/work-in-progress/attracters/) ([source](experiments/attracters/))
-- [minecraft-like](https://bruno-simon.com/lab/work-in-progress/minecraft-like/) ([source](experiments/minecraft-like/))
-- [particles-morphing](https://bruno-simon.com/lab/work-in-progress/particles-morphing/) ([source](experiments/particles-morphing/))
-- [particles-painting](https://bruno-simon.com/lab/work-in-progress/particles-painting/) ([source](experiments/particles-painting/))
-- [retro-css-animations](https://bruno-simon.com/lab/work-in-progress/retro-css-animations/) ([source](experiments/retro-css-animations/))
-- [vault](https://bruno-simon.com/lab/work-in-progress/vault/) ([source](experiments/vault/))
+- [attracters](https://bruno-simon.com/lab/work-in-progress/attracters/) ([source](work-in-progress/attracters/))
+- [minecraft-like](https://bruno-simon.com/lab/work-in-progress/minecraft-like/) ([source](work-in-progress/minecraft-like/))
+- [particles-morphing](https://bruno-simon.com/lab/work-in-progress/particles-morphing/) ([source](work-in-progress/particles-morphing/))
+- [retro-css-animations](https://bruno-simon.com/lab/work-in-progress/retro-css-animations/) ([source](work-in-progress/retro-css-animations/))
+- [vault](https://bruno-simon.com/lab/work-in-progress/vault/) ([source](work-in-progress/vault/))

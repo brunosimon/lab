@@ -1,3 +1,5 @@
+let ParticlesPainting = require( './ParticlesPainting.js' )
+
 class Application
 {
     constructor( options )
@@ -16,6 +18,7 @@ class Application
         this.setParticlesPainting()
         this.handleTabActive()
         this.handleResize()
+        this.handleDragAndDrop()
         this.setStats()
         this.setTweaker()
         this.loop()
@@ -29,9 +32,76 @@ class Application
         } )
 
         // Reset on click
-        this.particlesPainting.canvas.addEventListener( 'click', () =>
+        this.particlesPainting.canvas.addEventListener( 'click', ( event ) =>
         {
+            event.preventDefault()
+
             this.particlesPainting.startRandom()
+        } )
+    }
+
+    handleDragAndDrop()
+    {
+        let $container = document.querySelector( '.container' )
+        
+        // Drag over event
+        $container.addEventListener( 'dragover', ( event ) =>
+        {
+            // Prevent default
+            event.stopPropagation()
+            event.preventDefault()
+        } )
+        
+        // Drag leave event
+        $container.addEventListener( 'dragleave', ( event ) =>
+        {
+            // Remove class
+            $container.classList.remove( 'draging' )
+        } )
+        
+        // Drag enter event
+        $container.addEventListener( 'dragenter', ( event ) =>
+        {
+            // Prevent default
+            event.stopPropagation()
+            event.preventDefault()
+
+            // Add class
+            $container.classList.add( 'draging' )
+        } )
+
+        // Drop event
+        $container.addEventListener( 'drop', ( event ) =>
+        {
+            // Prevent default
+            event.stopPropagation()
+            event.preventDefault()
+
+            // Remove class
+            $container.classList.remove( 'draging' )
+
+            // Retrieve files
+            let files = event.dataTransfer.files
+
+            if( files.length )
+            {
+                let file = files[ 0 ]
+
+                if( file.type.match( /image.*/ ) )
+                {
+                    let reader = new FileReader()
+                    
+                    reader.onload = ( event ) =>
+                    {
+                        let image = document.createElement( 'img' )
+                        image.src= event.target.result
+
+                        this.particlesPainting.image.setImage( image )
+                    }
+                    
+                    reader.readAsDataURL( file )
+                }
+            }
         } )
     }
 
@@ -184,3 +254,5 @@ class Application
                     .name( 'reset random' )
     }
 }
+
+module.exports = Application

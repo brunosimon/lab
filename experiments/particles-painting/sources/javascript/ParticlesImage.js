@@ -22,21 +22,28 @@ class ParticlesImage
     load( src )
     {
         this.loaded = false
-        this.image  = new Image()
+        let image  = new Image()
 
-        this.image.addEventListener( 'load', () =>
+        image.addEventListener( 'load', () =>
         {
             this.loaded = true
 
-            this.setCoordinates()
-            this.setImageData()
-
-            this.getColorAtPoint( 200, 4 )
-
-            this.loadedCallback.apply( this )
+            this.setImage( image )
         } )
 
-        this.image.src = src
+        image.src = src
+    }
+
+    setImage( image )
+    {
+        this.image = image
+
+        this.setCoordinates()
+        this.setImageData()
+
+        this.getColorAtPoint( 200, 4 )
+
+        this.loadedCallback.apply( this )
     }
 
     getColorAtPoint( x, y )
@@ -101,3 +108,5 @@ class ParticlesImage
         this.context.drawImage( this.image, this.x, this.y, this.width, this.height )
     }
 }
+
+module.exports = ParticlesImage
