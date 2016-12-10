@@ -1,0 +1,69 @@
+html,body{width:100%;height:100%;overflow:hidden;}
+canvas#app {position:absolute;top:0;left:0;/*width:100%;height:100%;*/}
+
+/*
+ * UI
+ */
+.ui {color:#fff;font-family: 'Rationale',sans-serif;font-size:16px;-webkit-font-smoothing:antialiased;}
+
+.ui .pointer {position:absolute;top:50%;left:50%;width:2px;height:2px;margin:-1px 0 0 -1px;background:#fff;opacity:0;}
+
+.ui > .label {position:absolute;bottom:30px;right:-70px;width:100px;height:30px;line-height:30px;background:#101010;text-align:center;cursor:pointer;}
+.ui > .label i {position:absolute;top:0;left:0;width:30px;height:30px;}
+.ui > .label .text {position:absolute;top:0;left:0;width:100%;font:30px;opacity:0;}
+.ui > .label:hover {right:0px;}
+.ui > .label:hover i {opacity:0;}
+.ui > .label:hover .text {opacity:1;}
+.ui > .label i,
+.ui > .label .text {-webkit-transition:opacity 0.2s;}
+.ui > .label {-webkit-transition:right 0.2s;}
+
+.ui .instructions-popin {display:none;position:absolute;top:50%;left:50%;width:430px;height:350px;margin:-175px 0 0 -215px;padding:64px;background:#101010;opacity:0;}
+.ui .instructions-popin .inner {}
+.ui .instructions-popin .inner .instruction {position:relative;margin-bottom:43px;padding:0 0 0 83px;}
+.ui .instructions-popin .inner .instruction.camera i {position:absolute;display:block;top:0px;left:0px;width:35px;height:31px;background:url('../img/sprite.png') 0px 0px no-repeat;}
+.ui .instructions-popin .inner .instruction.fullscreen i {position:absolute;display:block;top:0px;left:11px;width:21px;height:21px;background:url('../img/sprite.png') 0px -41px no-repeat;}
+.ui .instructions-popin .inner .instruction.move i {position:absolute;display:block;top:-12px;left:-11px;width:65px;height:44px;background:url('../img/sprite.png') 0px -64px no-repeat;}
+.ui .instructions-popin .inner a.start {position:relative;top:14px;display:block;width:130px;height:32px;line-height:32px;margin:0 auto;text-align:center;text-decoration:none;color:#fff;border:1px solid #fff;border-radius:2px;cursor:pointer;}
+.ui .instructions-popin .inner a.start:hover {background:#fff;color:#101010;}
+.ui .instructions-popin .inner .instruction.camera i {-webkit-animation:mouse_move 3s infinite;-moz-animation:mouse_move 3s infinite;animation:mouse_move 3s infinite;}
+
+.ui .loading-popin {display:none;position:absolute;top:50%;left:50%;width:220px;margin:-80px 0 0 -100px;padding:20px;background:#101010;opacity:0;}
+.ui .loading-popin .title {margin-bottom:24px;text-align:center;}
+.ui .loading-popin .part {margin-bottom:18px;}
+.ui .loading-popin .part .label {margin-bottom:12px;}
+.ui .loading-popin .part .bar {height:5px;border-left:1px solid #fff;border-right:1px solid #fff;}
+.ui .loading-popin .part .bar .progress {position:relative;top:2px;width:0%;height:1px;margin:0 1px;background:#fff;}
+
+.ui .loading-popin .part .bar .progress {-webkit-transition:width 0.2s;-moz-transition:width 0.2s;transition:width 0.2s;}
+
+.ui .quality-popin {position:absolute;top:50%;left:50%;width:260px;margin:-80px 0 0 -130px;padding:20px 20px 30px 20px;background:#101010;}
+.ui .quality-popin .title {margin-bottom:24px;text-align:center;}
+.ui .quality-popin .qualities {text-align:center;}
+.ui .quality-popin .qualities a {display:inline-block;height:32px;width:60px;line-height:30px;text-align:center;margin:0 10px;color:#fff;text-decoration:none;border:1px solid #fff;}
+.ui .quality-popin .qualities a:hover {background:#fff;color:#101010;}
+
+
+@-webkit-keyframes mouse_move{
+  0%   {left:0px;}
+  20%   {left:-10px;}
+  40% {left:10px;}
+  60% {left:0px;}
+  100% {left:0px;}
+}
+
+@-moz-keyframes mouse_move{
+  0%   {left:0px;}
+  20%   {left:-10px;}
+  40% {left:10px;}
+  60% {left:0px;}
+  100% {left:0px;}
+}
+
+@keyframes mouse_move{
+  0%   {left:0px;}
+  20%   {left:-10px;}
+  40% {left:10px;}
+  60% {left:0px;}
+  100% {left:0px;}
+}

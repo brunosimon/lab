@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Minecraft Like webGL</title>
+    <link rel="stylesheet" href="src/css/reset.css">
+    <link rel="stylesheet" href="src/css/style.css">
+</head>
+<body>
+    <canvas id="game"></canvas>
+    <canvas id="hud"></canvas>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+    <script src="src/js/libs/three.min.js"></script>
+    <script src="src/js/libs/dat.gui.min.js"></script>
+    <script src="src/js/libs/stats.min.js"></script>
+    <script src="src/js/libs/request-animation-frame.js"></script>
+    <script src="src/js/libs/underscore.js"></script>
+    <script src="src/js/libs/class.class.js"></script>
+    <script src="src/js/app/abstract.class.js"></script>
+    <script src="src/js/app/app.class.js"></script>
+    <script src="src/js/app/debug.class.js"></script>
+    <script src="src/js/app/world.class.js"></script>
+    <script src="src/js/app/models.class.js"></script>
+    <script src="src/js/app/grid.class.js"></script>
+    <script src="src/js/app/block.class.js"></script>
+    <script src="src/js/app/player.class.js"></script>
+    <script src="src/js/app/controller.class.js"></script>
+    <script src="src/js/app/keyboard.class.js"></script>
+    <script src="src/js/app/mouse.class.js"></script>
+    <script src="src/js/app/ticker.class.js"></script>
+    <script src="src/js/app/camera.class.js"></script>
+    <script src="src/js/app/hud.class.js"></script>
+    <script src="src/js/app/environment.class.js"></script>
+    <script src="src/js/app/skybox.class.js"></script>
+    <script src="src/js/app/sun.class.js"></script>
+    <script src="src/js/app/moon.class.js"></script>
+    <script src="src/js/app/stars.class.js"></script>
+    <script src="src/js/app/sky.class.js"></script>
+    <script src="src/js/app/global_lights.class.js"></script>
+    <script type="text/javascript">
+
+        var app = new GAME.App({
+            canvas_game : document.getElementById('game'),
+            canvas_hud  : document.getElementById('hud')
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Multi render</title>
+</head>
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <script type="text/javascript" src="src/js/libs/three-js/three.min.js"></script>
+    <script type="text/javascript" src="src/js/libs/three-js/postprocessing/EffectComposer.js"></script>
+    <script type="text/javascript" src="src/js/libs/three-js/postprocessing/ShaderPass.js"></script>
+    <script type="text/javascript" src="src/js/libs/three-js/postprocessing/RenderPass.js"></script>
+    <script type="text/javascript" src="src/js/libs/three-js/postprocessing/MaskPass.js"></script>
+    <script type="text/javascript" src="src/js/libs/three-js/shaders/CopyShader.js"></script>
+    <script type="text/javascript" src="src/js/libs/three-js/shaders/AdditiveBlendingShader.js"></script>
+    <script type="text/javascript" src="src/js/libs/three-js/shaders/HorizontalBlurShader.js"></script>
+
+    <script>
+
+        // WINDOW
+        var WIDTH  = window.innerWidth,
+            HEIGHT = window.innerHeight;
+
+        // SCENE
+        var scene_1   = new THREE.Scene(),
+            scene_2   = new THREE.Scene(),
+            camera    = new THREE.PerspectiveCamera(60,WIDTH/HEIGHT,0.1,99999),
+            renderer  = new THREE.WebGLRenderer({canvas:document.getElementById('canvas'),alpha:true});
+
+        camera.position.z = 4;
+
+        renderer.setSize(WIDTH,HEIGHT);
+        renderer.setClearColor(0, 1);
+        renderer.autoClear = true;
+        renderer.shadowMapEnabled = true;
+        renderer.shadowMapSoft = true;
+        renderer.sortObjects = false;
+
+        // OBJECTS SCENE 1
+        var geometry_1 = new THREE.BoxGeometry(1,1,1),
+            material_1 = new THREE.MeshBasicMaterial({color:0xff0000}),
+            mesh_1     = new THREE.Mesh(geometry_1,material_1);
+        scene_1.add(mesh_1);
+
+        // OBJECTS SCENE 2
+        var geometry_2 = new THREE.BoxGeometry(1,2,1),
+            material_2 = new THREE.MeshBasicMaterial({color:0xcccccc}),
+            mesh_2     = new THREE.Mesh(geometry_2,material_2);
+        mesh_2.position.x = 0.5;
+        scene_2.add(mesh_2);
+
+        // COMPOSER 1
+        var renderTarget_1 = new THREE.WebGLRenderTarget(512,512,{format:THREE.RGBFormat,stencilBufer:false}),
+            composer_1     = new THREE.EffectComposer(renderer,renderTarget_1),
+            copyShader_1   = new THREE.ShaderPass(THREE.CopyShader),
+            effectHBlur    = new THREE.ShaderPass(THREE.HorizontalBlurShader);
+
+        effectHBlur.uniforms.h.value = 0.001;
+
+        composer_1.addPass(new THREE.RenderPass(scene_1, camera));
+        composer_1.addPass(copyShader_1);
+        composer_1.addPass(effectHBlur);
+        effectHBlur.renderToScreen = true;
+
+        // COMPOSER 2
+        var renderTarget_2   = new THREE.WebGLRenderTarget(WIDTH,HEIGHT,{ minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, stencilBufer: false }),
+            composer_2       = new THREE.EffectComposer(renderer,renderTarget_2),
+            copyShader_2     = new THREE.ShaderPass(THREE.CopyShader),
+            addOcclusionPass = new THREE.ShaderPass(AdditiveBlendingShader);
+
+        addOcclusionPass.uniforms.tAdd.value   = renderTarget_1;
+        addOcclusionPass.uniforms.fCoeff.value = 2.0;
+        addOcclusionPass.renderToScreen        = true;
+
+        composer_2.addPass(new THREE.RenderPass(scene_2, camera));
+        composer_2.addPass(copyShader_2);
+        composer_2.addPass(addOcclusionPass);
+
+        // LOOP
+        var loop = function()
+        {
+            window.requestAnimationFrame(loop);
+
+            // RENDER
+            // renderer.render(scene_2,camera);
+            composer_1.render();
+            composer_2.render();
+        };
+        window.requestAnimationFrame(loop);
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+Environment:
+  ✔ skybox @done (13-12-28 01:51)
+  ✔ animation @done (13-12-28 01:51)
+  ✔ day/night @done (13-12-28 01:51)
+  ✔ lights direction @done (13-12-30 00:08)
+  ✔ ligths colors @done (13-12-30 00:08)
+  ☐ dawn
+  ✔ Externalise day strength / night strength @done (13-12-30 00:08)
+Blocks:
+  ✔ solid models @done (13-12-16 19:13)
+  ✔ find textures pack @done (13-12-16 00:47)
+  ✔ texture materials @done (13-12-16 19:13)
+      ✔ loading @done (13-12-16 19:13)
+  ☐ player creation
+  ☐ player destruction
+  ☐ index axe Y positif
+  ☐ complet terrain
+Physics:
+  ✔ Y limit @done (13-12-15 23:23)
+  ✔ bug gravity increment when player not even moving @done (13-12-15 23:10)
+  ☐ bug vibration angle de block
+General:
+  ✔ cursor @done (13-12-16 00:34)
+  ✔ HUD @done (13-12-16 00:34)
+  ☐ GUI
+  ☐ window resize
+  ☐ fullscreen

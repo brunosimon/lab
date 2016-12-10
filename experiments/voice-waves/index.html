@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Voice Waves</title>
+    <link rel="stylesheet" href="src/css/style.css">
+    <link rel="stylesheet" href="http://bruno-simon.com/src/css/externals/back-link.css">
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <div class="debug"></div>
+
+    <a class="back-to-site dark" href="http://bruno-simon.com"><i></i> Bruno SIMON</a>
+
+    <script src="src/js/libs/require.js"></script>
+    <script src="src/js/libs/dat.gui.js"></script>
+    <script src="src/js/libs/rStats.js"></script>
+    <script src="src/js/libs/three-js/three.js"></script>
+    <script src="src/js/libs/three-js/postprocessing/BloomPass.js"></script>
+    <script src="src/js/libs/three-js/postprocessing/EffectComposer.js"></script>
+    <script src="src/js/libs/three-js/postprocessing/RenderPass.js"></script>
+    <script src="src/js/libs/three-js/postprocessing/ShaderPass.js"></script>
+    <script src="src/js/libs/three-js/postprocessing/MaskPass.js"></script>
+    <script src="src/js/libs/three-js/shaders/FXAAShader.js"></script>
+    <script src="src/js/libs/three-js/shaders/ConvolutionShader.js"></script>
+    <script src="src/js/libs/three-js/shaders/CopyShader.js"></script>
+    <script src="src/js/libs/three-js/shaders/AdditiveBlendingShader.js"></script>
+    <script src="src/js/libs/three-js/others/Mirror.js"></script>
+    <script src="src/js/libs/burno-0.1.js"></script>
+    <script src="src/js/app/app.class.js"></script>
+    <script src="src/js/app/microphone.class.js"></script>
+    <script src="src/js/app/ui.class.js"></script>
+    <script src="src/js/app/debug/stats.class.js"></script>
+    <script src="src/js/app/debug/tweaks.class.js"></script>
+    <script src="src/js/app/world/scene.class.js"></script>
+    <script src="src/js/app/world/camera.class.js"></script>
+    <script src="src/js/app/world/renderer.class.js"></script>
+    <script src="src/js/app/world/grid.class.js"></script>
+    <script src="src/js/app/world/floor.class.js"></script>
+    <script src="src/shaders/dummy-vertex.js"></script>
+    <script src="src/shaders/dummy-fragment.js"></script>
+    <script src="src/shaders/grid-vertex.js"></script>
+    <script src="src/shaders/grid-fragment.js"></script>
+    <script>
+
+        var app = new H.App();
+
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-3966601-5', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+</body>
+</html>

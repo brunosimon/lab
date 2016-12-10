@@ -1,0 +1,110 @@
+<html>
+<head>
+    <title>Introduction WebGL - Three.js</title>
+    <style>
+        body {padding:0;margin:0;}
+        canvas {width:100%;height:100%;}
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script src="http://threejs.org/build/three.min.js"></script>
+    <script src="src/js/raf.polyfill.js"></script>
+    <script>
+
+        // Init
+        var scene    = new THREE.Scene(),
+            camera   = new THREE.PerspectiveCamera(75,window.innerWidth / window.innerHeight,0.002,9999999),
+            renderer = new THREE.WebGLRenderer({canvas:document.getElementById('canvas')}),
+            clock    = new THREE.Clock(true);
+
+        camera.position.z = 2;
+        renderer.setSize(window.innerWidth,window.innerHeight);
+
+        // Add particles
+        var particles_geometry = new THREE.Geometry(),
+            particles_material = new THREE.ParticleSystemMaterial({
+                color           : 0xffffff,
+                size            : 1,
+                sizeAttenuation : false,
+                vertexColors    : true
+            }),
+            particles_system = new THREE.ParticleSystem(particles_geometry,particles_material),
+            particule        = null;
+
+        for(var i = 0; i < 200; i++)
+        {
+            particule         = new THREE.Vector3(0,0,0);
+            particule.speed   = {};
+            particule.speed.x = Math.random() * 0.01 - 0.005;
+            particule.speed.y = Math.random() * 0.01 - 0.005;
+            particule.speed.z = Math.random() * 0.01 - 0.005;
+            particles_geometry.vertices.push(
+                particule
+            );
+            particles_geometry.colors.push(
+                new THREE.Color().setHSL(0.4,1,0.8)
+            );
+        }
+
+        scene.add(particles_system);
+
+        // Mouse move
+        var mouse = {};
+        mouse.x   = 0;
+        mouse.y   = 0;
+        window.onmousemove = function(e)
+        {
+            mouse.x = e.clientX - window.innerWidth / 2;
+            mouse.y = e.clientY - window.innerHeight / 2;
+        };
+
+        // Resize
+        window.onresize = function resize()
+        {
+            renderer.setSize(window.innerWidth,window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        };
+
+        // Loop
+        function loop()
+        {
+            window.requestAnimationFrame(loop);
+
+            // Clock elapsed time
+            var elapsed_time = clock.getElapsedTime();
+
+            // Update camera
+            camera.position.x = mouse.x / 50;
+            camera.position.y = - mouse.y / 50;
+            camera.lookAt(particles_system.position);
+
+            // Update particules
+            for(var i = 0, len = particles_geometry.vertices.length; i < len; i++)
+            {
+                var vertice  = particles_geometry.vertices[i];
+
+                if(Math.sqrt(Math.pow(vertice.x,2) + Math.pow(vertice.y,2) + Math.pow(vertice.z,2)) > 2)
+                {
+                    vertice.x = 0;
+                    vertice.y = 0;
+                    vertice.z = 0;
+                }
+                else
+                {
+                    vertice.x   += vertice.speed.x;
+                    vertice.y   += vertice.speed.y;
+                    vertice.z   += vertice.speed.z;
+                }
+
+            }
+            particles_geometry.verticesNeedUpdate = true;
+
+            // Render
+            renderer.render(scene,camera);
+        }
+        window.requestAnimationFrame(loop);
+    </script>
+</body>
+</html>

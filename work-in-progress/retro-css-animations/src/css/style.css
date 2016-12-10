@@ -1,0 +1,17 @@
+body {background:#000;}
+
+.strip {position:absolute;top:0;left:0;width:500px;height:500px;background-size:4px;}
+.strip-h {background-image:repeating-linear-gradient(to right,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 2px,rgba(0,0,0,1) 2px,rgba(0,0,0,1) 4px);}
+.strip-v {background-image:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 2px,rgba(0,0,0,1) 2px,rgba(0,0,0,1) 4px);}
+
+.round {position:absolute;width:200px;height:200px;border-radius:100px;border:2px solid #00FFD0;animation:shock-wave 1s ease 0s infinite;transform:translateX(-50%) translateY(-50%);}
+.round-1 {top:200px;left:200px;animation-delay:0.0s;animation-duration:1.0s;}
+.round-2 {top:180px;left:120px;animation-delay:0.5s;animation-duration:0.9s;}
+.round-3 {top:300px;left:100px;animation-delay:0.4s;animation-duration:0.8s;}
+.round-4 {top:100px;left:100px;animation-delay:0.2s;animation-duration:0.7s;}
+
+@keyframes shock-wave {
+    0%   {width:0;height:0;opacity:1;}
+    60%  {opacity:1;}
+    100% {width:200px;height:200px;opacity:0;}
+}

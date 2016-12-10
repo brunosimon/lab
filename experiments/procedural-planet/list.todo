@@ -1,0 +1,16 @@
+[√] Refactoring planet class
+[√] Better sun vector handling
+[√] Gradient texture for planet diffuse
+[√] Resize
+[√] Better ice generation
+[√] Water level
+[√] Reflection
+[√] Bug Firefox
+[√] Generate with new seed
+[√] Clouds
+[√] More debug tweaks (sphere size)
+[√] Star
+[√] Integration to folio
+
+[ ] Night diffuse
+[ ] Position Y atmosphere bug

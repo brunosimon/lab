@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Audi TT</title>
+
+    <link rel="stylesheet" href="src/css/reset.css">
+    <link rel="stylesheet" href="src/css/style.css">
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <!-- LIBS -->
+    <script type="text/javascript" src="src/js/libs/class.js"></script>
+    <script type="text/javascript" src="src/js/libs/rStats.js"></script>
+    <script type="text/javascript" src="src/js/libs/dat.gui.min.js"></script>
+    <script type="text/javascript" src="src/js/libs/zepto.1.1.3.min.js"></script>
+    <script type="text/javascript" src="src/js/libs/gsap/TweenLite.min.js"></script>
+    <script type="text/javascript" src="src/js/libs/gsap/easing/EasePack.min.js"></script>
+    <script type="text/javascript" src="src/js/libs/three-js/three.min.js"></script>
+    <script type="text/javascript" src="src/js/libs/three-js/OBJLoader.js"></script>
+
+    <!-- CORE -->
+    <script type="text/javascript" src="src/js/app/app.js"></script>
+    <script type="text/javascript" src="src/js/app/core/abstract.class.js"></script>
+    <script type="text/javascript" src="src/js/app/core/event_emitter.class.js"></script>
+    <script type="text/javascript" src="src/js/app/core/app.class.js"></script>
+
+    <!-- TOOLS -->
+    <script type="text/javascript" src="src/js/app/tools/browser.class.js"></script>
+    <script type="text/javascript" src="src/js/app/tools/debug.class.js"></script>
+
+    <!-- COMPONENTS -->
+    <script type="text/javascript" src="src/js/app/components/world/world.class.js"></script>
+    <script type="text/javascript" src="src/js/app/components/world/camera.class.js"></script>
+    <script type="text/javascript" src="src/js/app/components/world/renderer.class.js"></script>
+
+    <script>
+        var app = new APP.CORE.App();
+        app.start();
+
+        var frame = function()
+        {
+            window.requestAnimationFrame(frame);
+            app.frame();
+        };
+        frame();
+    </script>
+</body>
+</html>

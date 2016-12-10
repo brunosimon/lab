@@ -1,0 +1,4 @@
+body,html {width:100%;height:100%;margin:0;padding:0;background:#000;}
+body {-webkit-user-select:none;-moz-user-select:-moz-none;-ms-user-select:none;user-select:none;}
+#canvas {position:absolute;top:0;left:0;width:100% !important;height:100% !important;cursor:move;}
+.dg.main {-webkit-transition:none !important;-moz-transition:none !important;-o-transition:none !important;transition:none !important;}

@@ -1,0 +1,43 @@
+* {box-sizing:border-box;}
+html,body {position:absolute;top:0;left:0;width:100%;height:100%;margin:0;padding:0;overflow:hidden;}
+span {display:block;}
+.boxes-container {position:absolute;left:50%;top:50%;-webkit-transform-style:preserve-3d;-moz-transform-style:preserve-3d;transform-style:preserve-3d;-webkit-transform:rotateX(-30deg) rotateY(30deg);-moz-transform:rotateX(-30deg) rotateY(30deg);-o-transform:rotateX(-30deg) rotateY(30deg);transform:rotateX(-30deg) rotateY(30deg);}
+.box {-webkit-transform-style:preserve-3d;-moz-transform-style:preserve-3d;transform-style:preserve-3d;}
+.box > span {position:absolute;top:0;left:0;opacity:1;-webkit-backface-visibility:hidden;-moz-backface-visibility:hidden;backface-visibility:hidden;}
+.boxes-container.rotation {-webkit-animation:box-container-rotation 40s linear infinite;-moz-animation:box-container-rotation 40s linear infinite;-o-animation:box-container-rotation 40s linear infinite;animation:box-container-rotation 40s linear infinite;}
+
+@-webkit-keyframes box-container-rotation
+{
+    0%   {-webkit-transform:rotateX(-30deg) rotateY(0deg);}
+    25%  {-webkit-transform:rotateX(45deg) rotateY(90deg);}
+    50%  {-webkit-transform:rotateX(-30deg) rotateY(180deg);}
+    75%  {-webkit-transform:rotateX(45deg) rotateY(270deg);}
+    100% {-webkit-transform:rotateX(-30deg) rotateY(360deg);}
+}
+
+@-moz-keyframes box-container-rotation
+{
+    0%   {-moz-transform:rotateX(-30deg) rotateY(0deg);}
+    25%  {-moz-transform:rotateX(45deg) rotateY(90deg);}
+    50%  {-moz-transform:rotateX(-30deg) rotateY(180deg);}
+    75%  {-moz-transform:rotateX(45deg) rotateY(270deg);}
+    100% {-moz-transform:rotateX(-30deg) rotateY(360deg);}
+}
+
+@-o-keyframes box-container-rotation
+{
+    0%   {-o-transform:rotateX(-30deg) rotateY(0deg);}
+    25%  {-o-transform:rotateX(45deg) rotateY(90deg);}
+    50%  {-o-transform:rotateX(-30deg) rotateY(180deg);}
+    75%  {-o-transform:rotateX(45deg) rotateY(270deg);}
+    100% {-o-transform:rotateX(-30deg) rotateY(360deg);}
+}
+
+@keyframes box-container-rotation
+{
+    0%   {transform:rotateX(-30deg) rotateY(0deg);}
+    25%  {transform:rotateX(45deg) rotateY(90deg);}
+    50%  {transform:rotateX(-30deg) rotateY(180deg);}
+    75%  {transform:rotateX(45deg) rotateY(270deg);}
+    100% {transform:rotateX(-30deg) rotateY(360deg);}
+}

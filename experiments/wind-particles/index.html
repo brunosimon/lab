@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Particles Shader</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <link rel="stylesheet" href="src/css/style.css">
+    <link rel="stylesheet" href="http://bruno-simon.com/src/css/externals/back-link.css">
+</head>
+<body>
+    <canvas id="canvas" width="400" height="400"></canvas>
+    <a class="back-to-site dark" href="http://bruno-simon.com"><i></i> Bruno SIMON</a>
+    <script src="src/js/dat.gui.min.js"></script>
+    <script src="src/js/rStats.js"></script>
+    <script src="src/js/request-animation-frame.js"></script>
+    <script src="src/js/underscore.js"></script>
+    <script src="src/js/class.class.js"></script>
+    <script src="src/js/abstract.class.js"></script>
+    <script src="src/js/app.class.js"></script>
+    <script src="src/js/perlin-noise.class.js"></script>
+    <script type="text/javascript">
+
+        /**
+         * STATS
+         */
+        var rS = new rStats({
+            CSSPath : 'src/css/',
+            values  :
+            {
+                raf :
+                {
+                    caption : 'RAF (ms)',
+                    over    : 25,
+                    average : true
+                },
+                fps :
+                {
+                    caption : 'Framerate (FPS)',
+                    below   : 50,
+                    average : true
+                }
+            }
+        });
+
+        //App
+        var app = new App(null,{canvas:document.getElementById('canvas')});
+
+        //Gui
+        var gui = new dat.GUI();
+        gui.add(app.options,'particule_size',0,10);
+        gui.add(app.options,'particule_count',0,5000);
+        gui.add(app.options,'persistence',0,1);
+        gui.add(app.perlin_noise.options,'intensity',0,1000);
+        gui.add(app.perlin_noise.options,'frequency',0,0.02);
+        gui.add(app.perlin_noise.options,'variation_speed',0,0.1);
+        gui.add(app.options,'background',['background-1.jpg','background-2.jpg','background-3.jpg','background-4.jpg']);
+        gui.add(app.perlin_noise.options,'debug');
+
+        gui.__controllers[1].onFinishChange(function(value) {
+            app.create_particules();
+        });
+
+        gui.__controllers[6].onChange(function(value) {
+            app.load_image();
+        });
+
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-3966601-5', 'auto');
+        ga('send', 'pageview');
+    </script>
+</body>
+</html>

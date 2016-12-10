@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trail Particles</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <link rel="stylesheet" href="src/css/style.css">
+    <link rel="stylesheet" href="http://bruno-simon.com/src/css/externals/back-link.css">
+</head>
+<body>
+    <div class="content">
+        <canvas id="canvas" width="600" height="800"></canvas>
+        <div id="drop-zone">
+            DROP IMAGE HERE
+        </div>
+    </div>
+    <div id="images"></div>
+    <a class="back-to-site dark" href="http://bruno-simon.com"><i></i> Bruno SIMON</a>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+    <script src="src/js/dat.gui.min.js"></script>
+    <script src="src/js/rStats.js"></script>
+    <script src="src/js/request-animation-frame.js"></script>
+    <script src="src/js/underscore.js"></script>
+    <script src="src/js/class.class.js"></script>
+    <script src="src/js/abstract.class.js"></script>
+    <script src="src/js/app.class.js"></script>
+    <script src="src/js/point.class.js"></script>
+    <script type="text/javascript">
+
+        /**
+         * STATS
+         */
+        var rS = new rStats({
+            CSSPath : 'src/css/',
+            values  :
+            {
+                raf :
+                {
+                    caption : 'RAF (ms)',
+                    over    : 25,
+                    average : true
+                },
+                fps :
+                {
+                    caption : 'Framerate (FPS)',
+                    below   : 50,
+                    average : true
+                }
+            }
+        });
+
+        //Images
+        var images = [];
+        for(var i = 1; i <= 4; i++)
+            images.push('image-'+i+'.jpg');
+
+        //App
+        var app = new App(null,{canvas:document.getElementById('canvas')});
+
+        //GUI
+        var gui = new dat.GUI();
+        gui.add(app.options,'image',images);
+        gui.add(app.options,'particles_count',0,50000).step(1);
+        gui.add(app.options,'minimum_speed',0,1).step(0.01);
+        gui.add(app.options,'multiplier',0,20).step(1);
+        gui.add(app.options,'wind_x',-10,10).step(0.1);
+        gui.add(app.options,'wind_y',-10,10).step(0.1);
+        gui.add(app.options,'persistence',0,1);
+        gui.add(app.options,'fill_alpha',0,1).step(0.01);
+        gui.addColor(app.options,'fill_color');
+        gui.addColor(app.options,'background_color');
+        gui.add(app,'save_image');
+
+        gui.__controllers[0].onChange(function()
+        {
+            app.get_gray_image_data();
+        });
+
+        gui.__controllers[1].onChange(function()
+        {
+            app.create_points();
+        });
+
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-3966601-5', 'auto');
+        ga('send', 'pageview');
+    </script>
+</body>
+</html>

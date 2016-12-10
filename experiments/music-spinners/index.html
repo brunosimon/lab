@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>Music Spinners</title>
+
+    <link rel="stylesheet" href="src/css/style.css">
+    <link rel="stylesheet" href="src/css/rStats.css">
+    <link rel="stylesheet" href="http://bruno-simon.com/src/css/externals/back-link.css">
+</head>
+<body>
+
+    <canvas class="experiment"></canvas>
+    <audio src="src/audio/nighcall-dead-v.mp3"></audio>
+
+    <a class="back-to-site dark" href="http://bruno-simon.com"><i></i> Bruno SIMON</a>
+
+    <script src="src/js/libs/dat.gui.js"></script>
+    <script src="src/js/libs/rStats.js"></script>
+    <script src="src/js/libs/burno-0.3.min.js"></script>
+    <script src="src/js/app/components/app.class.js"></script>
+    <script src="src/js/app/components/background.class.js"></script>
+    <script src="src/js/app/components/light.class.js"></script>
+    <script src="src/js/app/components/particle.class.js"></script>
+    <script src="src/js/app/components/particles.class.js"></script>
+    <script src="src/js/app/components/spinners.class.js"></script>
+    <script src="src/js/app/components/spinner.class.js"></script>
+    <script src="src/js/app/components/tail.class.js"></script>
+    <script src="src/js/app/tools/tweaker.class.js"></script>
+    <script src="src/js/app/tools/audio.class.js"></script>
+    <script>
+
+        var app = new B.Components.App();
+
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-3966601-5', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+</body>
+</html>

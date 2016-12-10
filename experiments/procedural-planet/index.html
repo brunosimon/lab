@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Procedural Planet</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <link rel="stylesheet" href="src/css/style.css">
+    <link rel="stylesheet" href="http://bruno-simon.com/src/css/externals/back-link.css">
+</head>
+<body>
+    <canvas id="three-canvas"></canvas>
+
+    <a class="back-to-site dark" href="http://bruno-simon.com"><i></i> Bruno SIMON</a>
+
+    <!-- SKY SHADER -->
+    <script type="x-shader/x-vertex" id="sky-vertex-shader">
+
+        //
+        // Atmospheric scattering vertex shader
+        //
+        // Author: Sean O'Neil
+        //
+        // Copyright (c) 2004 Sean O'Neil
+        //
+
+        uniform vec3 v3LightPosition;       // The direction vector to the light source
+        uniform vec3 v3InvWavelength;       // 1 / pow(wavelength, 4) for the red, green, and blue channels
+        uniform float fCameraHeight;        // The camera's current height
+        uniform float fCameraHeight2;       // fCameraHeight^2
+        uniform float fOuterRadius;         // The outer (atmosphere) radius
+        uniform float fOuterRadius2;        // fOuterRadius^2
+        uniform float fInnerRadius;         // The inner (planetary) radius
+        uniform float fInnerRadius2;        // fInnerRadius^2
+        uniform float fKrESun;              // Kr * ESun
+        uniform float fKmESun;              // Km * ESun
+        uniform float fKr4PI;               // Kr * 4 * PI
+        uniform float fKm4PI;               // Km * 4 * PI
+        uniform float fScale;               // 1 / (fOuterRadius - fInnerRadius)
+        uniform float fScaleDepth;          // The scale depth (i.e. the altitude at which the atmosphere's average density is found)
+        uniform float fScaleOverScaleDepth; // fScale / fScaleDepth
+
+        const int   nSamples = 3;
+        const float fSamples = 3.0;
+
+        varying vec3 v3Direction;
+        varying vec3 vColor0;
+        varying vec3 vColor1;
+
+        float scale(float fCos)
+        {
+            float x = 1.0 - fCos;
+
+            return fScaleDepth * exp( - 0.00287 + x * ( 0.459 + x * ( 3.83 + x * ( - 6.80 + x * 5.25 ) ) ) );
+        }
+
+        void main()
+        {
+            // Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
+            vec3 v3Ray = position - cameraPosition;
+            float fFar = length( v3Ray );
+            v3Ray /= fFar;
+
+            // Calculate the closest intersection of the ray with the outer atmosphere (which is the near point of the ray passing through the atmosphere)
+            float B     = 2.0 * dot( cameraPosition, v3Ray );
+            float C     = fCameraHeight2 - fOuterRadius2;
+            float fDet  = max( 0.0, B * B - 4.0 * C );
+            float fNear = 0.5 * (-B - sqrt(fDet));
+
+            // Calculate the ray's starting position, then calculate its scattering offset
+            vec3 v3Start = cameraPosition + v3Ray * fNear;
+            fFar -= fNear;
+            float fStartAngle  = dot( v3Ray, v3Start ) / fOuterRadius;
+            float fStartDepth  = exp( - 1.0 / fScaleDepth );
+            float fStartOffset = fStartDepth * scale( fStartAngle );
+            //vColor0 = vec3(1.0, 0, 0) * fStartAngle;
+
+            // Initialize the scattering loop variables
+            float fSampleLength = fFar / fSamples;
+            float fScaledLength = fSampleLength * fScale;
+            vec3 v3SampleRay    = v3Ray * fSampleLength;
+            vec3 v3SamplePoint  = v3Start + v3SampleRay * 0.5;
+
+            //gl_FrontColor = vec4(0.0, 0.0, 0.0, 0.0);
+
+            // Now loop through the sample rays
+            vec3 v3FrontColor = vec3( 0.0, 0.0, 0.0 );
+            for( int i = 0; i < nSamples; i++ )
+            {
+                float fHeight      = length( v3SamplePoint );
+                float fDepth       = exp( fScaleOverScaleDepth * ( fInnerRadius - fHeight ) );
+                float fLightAngle  = dot( normalize(v3LightPosition), v3SamplePoint ) / fHeight;
+                float fCameraAngle = dot( v3Ray, v3SamplePoint ) / fHeight;
+                float fScatter     = ( fStartOffset + fDepth * ( scale( fLightAngle ) - scale( fCameraAngle ) ) );
+                vec3 v3Attenuate   = exp( - fScatter * ( v3InvWavelength * fKr4PI + fKm4PI ) );
+
+                v3FrontColor  += v3Attenuate * ( fDepth * fScaledLength );
+                v3SamplePoint += v3SampleRay;
+            }
+
+            // Finally, scale the Mie and Rayleigh colors and set up the varying variables for the pixel shader
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+            vColor0          = v3FrontColor * ( v3InvWavelength * fKrESun );
+            vColor1          = v3FrontColor * fKmESun;
+
+            v3Direction = cameraPosition - position;
+        }
+    </script>
+
+    <script type="x-shader/x-fragment" id="sky-fragment-shader">
+
+        //
+        // Atmospheric scattering fragment shader
+        //
+        // Author: Sean O'Neil
+        //
+        // Copyright (c) 2004 Sean O'Neil
+        //
+
+        uniform vec3 v3LightPos;
+        uniform float g;
+        uniform float g2;
+
+        varying vec3 v3Direction;
+        varying vec3 vColor0;
+        varying vec3 vColor1;
+
+        // Calculates the Mie phase function
+        float getMiePhase( float fCos, float fCos2, float g, float g2 )
+        {
+             return 1.5 * ( ( 1.0 - g2 ) / ( 2.0 + g2 ) ) * ( 1.0 + fCos2 ) / pow( 1.0 + g2 - 2.0 * g * fCos, 1.5 );
+        }
+
+        // Calculates the Rayleigh phase function
+        float getRayleighPhase( float fCos2 )
+        {
+            return 0.75 + 0.75 * fCos2;
+        }
+
+        void main()
+        {
+            float fCos  = dot( v3LightPos, v3Direction ) / length( v3Direction );
+            float fCos2 = fCos * fCos;
+
+            vec3 color = getRayleighPhase( fCos2 ) * vColor0 + getMiePhase( fCos, fCos2, g, g2 ) * vColor1;
+
+            gl_FragColor   = vec4( color, 1.0 );
+            gl_FragColor.a = gl_FragColor.b;
+        }
+
+    </script>
+
+    <!-- PLANET SHADER MATERIAL -->
+    <script type="x-shader/x-vertex" id="planet-vertex-shader">
+
+        uniform vec3 v3LightPosition;       // The direction vector to the light source
+        uniform vec3 v3LightPosition2;      // Test
+        uniform vec3 v3InvWavelength;       // 1 / pow(wavelength, 4) for the red, green, and blue channels
+        uniform float fCameraHeight;        // The camera's current height
+        uniform float fCameraHeight2;       // fCameraHeight^2
+        uniform float fOuterRadius;         // The outer (atmosphere) radius
+        uniform float fOuterRadius2;        // fOuterRadius^2
+        uniform float fInnerRadius;         // The inner (planetary) radius
+        uniform float fInnerRadius2;        // fInnerRadius^2
+        uniform float fKrESun;              // Kr * ESun
+        uniform float fKmESun;              // Km * ESun
+        uniform float fKr4PI;               // Kr * 4 * PI
+        uniform float fKm4PI;               // Km * 4 * PI
+        uniform float fScale;               // 1 / (fOuterRadius - fInnerRadius)
+        uniform float fScaleDepth;          // The scale depth (i.e. the altitude at which the atmosphere's average density is found)
+        uniform float fScaleOverScaleDepth; // fScale / fScaleDepth
+        uniform sampler2D tDiffuse;
+
+        // varying vec3 v3Direction;
+        varying vec3 vColor0;
+        varying vec3 vColor1;
+        varying vec3 vNormal;
+        varying vec2 vUv;
+        varying vec3 vPosition;
+        varying vec3 vViewPosition;
+        varying vec3 vLigthViewPosition;
+
+        const int nSamples = 3;
+        const float fSamples = 3.0;
+
+        float scale(float fCos)
+        {
+            float x = 1.0 - fCos;
+            return fScaleDepth * exp(-0.00287 + x*(0.459 + x*(3.83 + x*(-6.80 + x*5.25))));
+        }
+
+        void main(void)
+        {
+            // Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
+
+
+            vPosition = vec3(modelMatrix * vec4(position, 1.0));
+
+            vec3 v3Ray = vPosition - cameraPosition;
+            float fFar = length(v3Ray);
+            v3Ray /= fFar;
+
+            // Calculate the closest intersection of the ray with the outer atmosphere (which is the near point of the ray passing through the atmosphere)
+            float B     = 2.0 * dot(cameraPosition, v3Ray);
+            float C     = fCameraHeight2 - fOuterRadius2;
+            float fDet  = max(0.0, B*B - 4.0 * C);
+            float fNear = 0.5 * (-B - sqrt(fDet));
+
+            // Calculate the ray's starting position, then calculate its scattering offset
+            vec3 v3Start = cameraPosition + v3Ray * fNear;
+            fFar -= fNear;
+            float fDepth = exp((fInnerRadius - fOuterRadius) / fScaleDepth);
+            float fCameraAngle  = dot(-v3Ray, vPosition) / length(vPosition);
+            float fLightAngle   = dot(normalize(v3LightPosition), vPosition) / length(vPosition);
+            float fCameraScale  = scale(fCameraAngle);
+            float fLightScale   = scale(fLightAngle);
+            float fCameraOffset = fDepth*fCameraScale;
+            float fTemp         = (fLightScale + fCameraScale);
+
+            // Initialize the scattering loop variables
+            float fSampleLength = fFar / fSamples;
+            float fScaledLength = fSampleLength * fScale;
+            vec3 v3SampleRay    = v3Ray * fSampleLength;
+            vec3 v3SamplePoint  = v3Start + v3SampleRay * 0.5;
+
+            // Now loop through the sample rays
+            vec3 v3FrontColor = vec3(0.0, 0.0, 0.0);
+            vec3 v3Attenuate;
+            for(int i=0; i<nSamples; i++)
+            {
+                float fHeight  = length(v3SamplePoint);
+                float fDepth   = exp(fScaleOverScaleDepth * (fInnerRadius - fHeight));
+                float fScatter = fDepth*fTemp - fCameraOffset;
+                v3Attenuate    = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI));
+                v3FrontColor  += v3Attenuate * (fDepth * fScaledLength);
+                v3SamplePoint += v3SampleRay;
+            }
+
+            // Calculate the attenuation factor for the ground
+            vColor0 = v3Attenuate;
+            vColor1 = v3FrontColor * (v3InvWavelength * fKrESun + fKmESun);
+
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+            vUv = uv;
+
+            // Specular
+            vViewPosition = vec3( modelViewMatrix * vec4( position, 1.0 ) );
+            vNormal       = normalMatrix * normal;
+
+            vLigthViewPosition = vec3( viewMatrix * vec4( v3LightPosition, 1.0 ) );
+        }
+
+    </script>
+
+    <script type="x-shader/x-fragment" id="planet-fragment-shader">
+        uniform float time;
+
+        uniform float     fRadius;
+        uniform float     fNightScale;
+        uniform float     fWaterLevel;
+        uniform float     fWaterSpecular;
+        uniform float     fGroundSpecular;
+        uniform float     fIceOffset;
+        uniform float     fIceOrientationImpact;
+        uniform float     fCloudsDensity;
+        uniform float     fCloudsDiffuse;
+        uniform vec3      v3CloudsColor;
+        uniform vec3      v3SpecularColor;
+        uniform vec3      v3LightPosition;
+        uniform sampler2D tDiffuse;
+        uniform sampler2D tDiffuseNight;
+        uniform sampler2D tWaterGradient;
+        uniform sampler2D tGroundGradient;
+        uniform sampler2D tIceGradient;
+
+        varying vec3 vColor0;
+        varying vec3 vColor1;
+        varying vec3 vNormal;
+        varying vec2 vUv;
+        varying vec3 vPosition;
+        varying vec3 vViewPosition;
+        varying vec3 vLigthViewPosition;
+
+        void main (void)
+        {
+            // Data
+            vec3 diffuseData = texture2D( tDiffuse, vUv ).xyz;
+            float height     = diffuseData.r;
+            float cloud      = diffuseData.b;
+
+            // Water / Ground / Ice
+            vec3 groundColor = vec3( 0.0, 0.0, 0.0 );
+
+            if( height + abs( vPosition.y / fRadius ) * fIceOrientationImpact - (1.0 - fIceOffset) < 0.0 )
+            {
+                // Water
+                if( height < fWaterLevel )
+                    groundColor = texture2D( tWaterGradient, vec2( height / fWaterLevel, 0.0 ) ).xyz;
+                // Ground
+                else
+                    groundColor = texture2D( tGroundGradient, vec2( ( height - fWaterLevel ) / ( 1.0 - fWaterLevel ), 0.0 ) ).xyz;
+            }
+            // Ice
+            else
+            {
+                groundColor = texture2D( tIceGradient, vec2( height / ( 1.0 - fIceOffset ) - fIceOffset, 0.0 ) ).xyz;
+            }
+
+            // Cloud
+            if(cloud < 1.0 - fCloudsDensity)
+            {
+                cloud = 0.0;
+            }
+            else
+            {
+                cloud -= 1.0 - fCloudsDensity;
+                cloud = cloud / fCloudsDiffuse;
+            }
+            groundColor = mix( groundColor, v3CloudsColor, cloud );
+
+            // Night
+            vec3 diffuseNightTex = texture2D( tDiffuseNight, vUv ).xyz;
+            diffuseNightTex = vec3( 0.0, 0.0, 0.0 );
+            vec3 night = 2.0 * fNightScale * diffuseNightTex * diffuseNightTex * (1.0 - vColor0);
+
+            // Day
+            vec3 day = groundColor * vColor0;
+
+            // Specular
+            vec3 normal   = normalize( vNormal );
+            vec3 lightRelativePosition = normalize(v3LightPosition) - cameraPosition;
+            vec3 lightDir = normalize( vLigthViewPosition - vViewPosition );
+
+            float lambertian = max( dot( lightDir, normal ), 0.0 );
+            float specular   = 0.0;
+
+            if( lambertian > 0.0 )
+            {
+                vec3 reflectDir = reflect( - lightDir, normal );
+                vec3 viewDir    = normalize( - vViewPosition );
+
+                float specAngle = max( dot( reflectDir, viewDir ), 0.0 );
+                specular  = pow( specAngle, 4.0 );
+                specular *= lambertian;
+            }
+            float specularStrength = 0.0;
+            if( height < fWaterLevel )
+                specularStrength = fWaterSpecular;
+            else
+                specularStrength = fGroundSpecular;
+
+            vec4 v4Specular = vec4( specular * specularStrength ) * vec4( v3SpecularColor, 1.0 ) * 1.0;
+
+            // Frag color
+            // gl_FragColor = vec4(vColor1, 1.0);  // Atmosphere
+            // gl_FragColor = vec4(day, 1.0); // Texture
+            // gl_FragColor = vec4(vColor1, 1.0) + vec4(day + night, 1.0); // Texture + Night texture + Atmosphere
+            gl_FragColor = vec4( vColor1, 1.0 ) + vec4( day + night, 1.0 ) + v4Specular; // Texture + Night texture + Atmosphere + Specular
+        }
+
+    </script>
+
+
+    <!-- PLANET TEXTURE SHADER -->
+    <script type="x-shader/x-vertex" id="planet-texture-vertex-shader">
+
+        varying vec2 vUv;
+
+        void main()
+        {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        }
+
+    </script>
+
+    <script type="x-shader/x-fragment" id="planet-texture-fragment-shader">
+
+        varying vec2 vUv;
+
+        uniform float fCloudsDistortion;
+        uniform vec3 v3Seed;
+        uniform int  index;
+
+        float random = 43758.5453;
+
+        int mod( int x, int m )
+        {
+            return int( mod( float( x ), float( m ) ) );
+        }
+
+        float random5( vec3 co )
+        {
+            return fract( sin( dot( co.xyz ,v3Seed ) ) * random );
+        }
+
+        float random4( float x, float y, float z )
+        {
+            return random5(vec3(x, y, z));
+        }
+
+        float random4( int x, int y, int z )
+        {
+            return random4( float( x ), float( y ), float( z ) );
+        }
+
+        float interpolation( float a, float b, float x )
+        {
+            float ft = x * 3.1415927;
+            float f  = ( 1.0 - cos( ft ) ) * 0.5;
+            return a * ( 1.0 - f ) + b * f;
+        }
+
+        float tricosine( vec3 coordFloat )
+        {
+            vec3 coord0 = vec3( floor( coordFloat.x ), floor( coordFloat.y ), floor( coordFloat.z ) );
+            vec3 coord1 = vec3( coord0.x + 1.0, coord0.y + 1.0, coord0.z + 1.0 );
+            float xd    = ( coordFloat.x - coord0.x ) / max( 1.0, ( coord1.x - coord0.x ) );
+            float yd    = ( coordFloat.y - coord0.y ) / max( 1.0, ( coord1.y - coord0.y ) );
+            float zd    = ( coordFloat.z - coord0.z ) / max( 1.0, ( coord1.z - coord0.z ) );
+            float c00   = interpolation( random4( coord0.x, coord0.y, coord0.z), random4( coord1.x, coord0.y, coord0.z ), xd );
+            float c10   = interpolation( random4( coord0.x, coord1.y, coord0.z), random4( coord1.x, coord1.y, coord0.z ), xd );
+            float c01   = interpolation( random4( coord0.x, coord0.y, coord1.z), random4( coord1.x, coord0.y, coord1.z ), xd );
+            float c11   = interpolation( random4( coord0.x, coord1.y, coord1.z), random4( coord1.x, coord1.y, coord1.z ), xd );
+            float c0    = interpolation( c00, c10, yd );
+            float c1    = interpolation( c01, c11, yd );
+            float c     = interpolation( c0, c1, zd );
+
+            return c;
+        }
+
+        float nearestNeighbour(vec3 coordFloat)
+        {
+            return random4( int( floor( coordFloat.x ) ), int( floor( coordFloat.y ) ), int( floor( coordFloat.z ) ) );
+        }
+
+        float helper( float x, float y, float z, float resolution )
+        {
+            x = ( x + 1.0 ) / 2.0 * resolution;
+            y = ( y + 1.0 ) / 2.0 * resolution;
+            z = ( z + 1.0 ) / 2.0 * resolution;
+
+            vec3 coordFloat    = vec3( x, y, z );
+            float interpolated = tricosine( coordFloat );
+
+            return interpolated * 2.0 - 1.0;
+        }
+
+        float getHeight( float x, float y, float z )
+        {
+            float h = 0.5;
+            for( int i = 0; i < 5; ++i )
+            {
+                float resolution = pow( 2.0, 2.0 + float( i ) * 2.0 );
+                float level      = helper( x, y, z, resolution );
+
+                h *= 1.0 + level * ( 0.8 / ( pow( 2.0, 1.0 + float( i ) ) ) );
+            }
+
+            h = clamp( h, 0.0, 1.0 );
+
+            return h;
+        }
+
+        float getCloud( float x, float y, float z )
+        {
+            float h = 0.5;
+            for( int i = 0; i < 7; ++i )
+            {
+                float resolution = pow( 2.0, 3.0 + float( i ) * 2.0 );
+                float level      = helper( x, y, z, resolution );
+
+                h *= 1.0 + level * ( 0.8 / ( pow( 2.0, 1.0 + float( i ) ) ) );
+            }
+
+            h = clamp( h, 0.0, 1.0 );
+
+            return h;
+        }
+
+        float getCloudOffset( float x, float y, float z )
+        {
+            float h = 0.5;
+            for( int i = 0; i < 3; ++i )
+            {
+                float resolution = pow( 2.0, 4.0 + float( i ) * 2.0 );
+                float level      = helper( x, y, z, resolution );
+
+                h *= 1.0 + level * ( 0.8 / ( pow( 2.0, 1.0 + float( i ) ) ) );
+            }
+
+            h = clamp( h, 0.0, 1.0 );
+
+            return h;
+        }
+
+        vec4 getColor( float x, float y, float z, float height )
+        {
+            vec3 color;
+
+            // Ground
+            color.r = height;
+
+            // Lights
+            color.g = 0.0;
+            if( height * abs( y ) > 0.45 && height * abs( y ) < 0.5 )
+                color.g = 1.0;
+
+            return vec4( color, 1.0 );
+        }
+
+        vec3 getSphericalCoord( int index, float x, float y, float width )
+        {
+            width *= 0.5;
+            x     -= width;
+            y     -= width;
+
+            vec3 coord = vec3( 0.0, 0.0, 0.0 );
+
+            if(index == 0)      { coord.x = width;   coord.y = - y;     coord.z = - x; }
+            else if(index == 1) { coord.x = - width; coord.y = - y;     coord.z = x; }
+            else if(index == 2) { coord.x = x;       coord.y = width;   coord.z = y; }
+            else if(index == 3) { coord.x = x;       coord.y = - width; coord.z = - y; }
+            else if(index == 4) { coord.x = x;       coord.y = - y;     coord.z = width; }
+            else if(index == 5) { coord.x = - x;     coord.y = - y;     coord.z = - width; }
+
+            return normalize( coord );
+        }
+
+        void main()
+        {
+            float x = vUv.x;
+            float y = 1.0 - vUv.y;
+
+            // Get sphetical coordinates
+            vec3 sphericalCoord = getSphericalCoord( index, x * 1024.0, y * 1024.0, 1024.0 );
+
+            // Get height
+            float height = getHeight( sphericalCoord.x, sphericalCoord.y, sphericalCoord.z );
+
+            // Get color
+            vec4 color = getColor( sphericalCoord.x, sphericalCoord.y, sphericalCoord.z, height );
+            // vec4 color = vec4(height,height,height,1);
+
+            // Get cloud
+            vec3 seed  = vec3( 78.233, 12.9898, 1.23456 ); // Change seed
+            random = 27710.9921;
+
+            // vec3 cloudOffset = getCloudOffset( sphericalCoord.x, sphericalCoord.y, sphericalCoord.z );
+            float cloudOffset = getCloudOffset( sphericalCoord.x, sphericalCoord.y, sphericalCoord.z ) * 0.2;
+            cloudOffset *= fCloudsDistortion;
+
+            float cloud = getCloud( sphericalCoord.x + cloudOffset, sphericalCoord.y + cloudOffset, sphericalCoord.z + cloudOffset );
+            color.b = cloud;
+
+            // gl_FragColor = mix( color, cloud, cloud.a );
+            // gl_FragColor = mix( color, vec4(1) * color + vec4(1.0) * cloud, cloud.a );
+            // gl_FragColor = vec4(0.5) * color + vec4(0.5) * cloud;
+            gl_FragColor = color;
+        }
+
+    </script>
+
+    <!-- LIBS : MISC -->
+    <script src="src/js/libs/dat.gui.js"></script>
+    <script src="src/js/libs/rStats.js"></script>
+    <script src="src/js/libs/jquery-2.1.1.min.js"></script>
+    <script src="src/js/libs/class.js"></script>
+    <script src="src/js/libs/matter-0.8.0.min.js"></script>
+    <script src="src/js/libs/howler.min.js"></script>
+
+    <!-- LIBS : THREE -->
+    <script src="src/js/libs/three-js/three.min.js"></script>
+    <script src="src/js/libs/three-js/shaders/AdditiveBlendingShader.js"></script>
+    <script src="src/js/libs/three-js/shaders/ConvolutionShader.js"></script>
+    <script src="src/js/libs/three-js/shaders/CopyShader.js"></script>
+    <script src="src/js/libs/three-js/shaders/VerticalBlurShader.js"></script>
+    <script src="src/js/libs/three-js/shaders/HorizontalBlurShader.js"></script>
+    <script src="src/js/libs/three-js/shaders/VerticalTiltShiftShader.js"></script>
+    <script src="src/js/libs/three-js/shaders/HorizontalTiltShiftShader.js"></script>
+    <script src="src/js/libs/three-js/shaders/BrightnessContrastShader.js"></script>
+    <script src="src/js/libs/three-js/shaders/FXAAShader.js"></script>
+    <script src="src/js/libs/three-js/shaders/ColorCorrectionShader.js"></script>
+    <script src="src/js/libs/three-js/postprocessing/EffectComposer.js"></script>
+    <script src="src/js/libs/three-js/postprocessing/BloomPass.js"></script>
+    <script src="src/js/libs/three-js/postprocessing/RenderPass.js"></script>
+    <script src="src/js/libs/three-js/postprocessing/ShaderPass.js"></script>
+    <script src="src/js/libs/three-js/postprocessing/MaskPass.js"></script>
+
+    <!-- APP -->
+    <script src="src/js/app/app.js"></script>
+
+    <!-- CORE -->
+    <script src="src/js/app/core/abstract.class.js"></script>
+    <script src="src/js/app/core/event_emitter.class.js"></script>
+    <script src="src/js/app/core/app.class.js"></script>
+
+    <!-- COMPONENTS -->
+    <script src="src/js/app/components/debug.class.js"></script>
+    <script src="src/js/app/components/ui.class.js"></script>
+    <script src="src/js/app/components/sounds.class.js"></script>
+    <script src="src/js/app/components/world/world.class.js"></script>
+    <script src="src/js/app/components/world/renderer.class.js"></script>
+    <script src="src/js/app/components/world/sun.class.js"></script>
+    <script src="src/js/app/components/world/planet/planet.class.js"></script>
+    <script src="src/js/app/components/world/planet/sky.class.js"></script>
+    <script src="src/js/app/components/world/planet/ground.class.js"></script>
+    <script src="src/js/app/components/world/planet/gradient_texture.class.js"></script>
+
+    <!-- TOOLS -->
+    <script src="src/js/app/tools/browser.class.js"></script>
+    <script src="src/js/app/tools/css.class.js"></script>
+    <script src="src/js/app/tools/images.class.js"></script>
+    <script src="src/js/app/tools/three_helper.class.js"></script>
+    <script src="src/js/app/tools/keyboard.class.js"></script>
+    <script src="src/js/app/tools/mouse.class.js"></script>
+    <script src="src/js/app/tools/ticker.class.js"></script>
+
+    <script>
+
+        var app = new APP.CORE.App();
+        app.start();
+
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-3966601-5', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+</body>
+</html>

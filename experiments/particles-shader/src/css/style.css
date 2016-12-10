@@ -1,0 +1,82 @@
+html,body {position:relative;top:0;left:0;width:100%;height:100%;margin:0;padding:0;background:#000;-webkit-font-smoothing:antialiased;font-family:'Luckiest Guy',cursive;font-size:12px;overflow:hidden;}
+* {box-sizing:border-box;}
+.dg * {box-sizing:content-box;}
+a {color:inherit;}
+
+/* CANVAS */
+canvas {display:block;position:absolute;top:0;left:0;}
+canvas.physics-canvas {top:46px;background:rgba(34,34,34,0.2) !important;}
+canvas.physics-canvas.hidden {display:none;}
+canvas.level-canvas {top:46px;background:rgba(34,34,34,0.2) !important;}
+canvas.level-canvas.hidden {display:none;}
+canvas#three-canvas {-webkit-transition:-webkit-filter 0.3s;}
+
+/* UI */
+.ui {position:fixed;}
+
+.ui h1 {position:fixed;top:50%;left:50%;width:400px;margin:-280px 0 0 -200px;text-align:center;color:#fff;text-shadow: 0 3px 0 #C9C9C9;font-size:60px;letter-spacing:2px;}
+
+.ui .tweaks,
+.ui .credits-trigger,
+.ui .credits,
+.ui .loose,
+.ui .close,
+.ui .play,
+.ui .replay,
+.ui .instruction,
+.ui .scores,
+.ui .time-live,
+.ui .elves-live,
+.ui .twitter,
+.ui .facebook {background:#1E2734;color:#fff;border:4px solid #fff;box-shadow:0px 5px #C9C9C9;opacity:1;}
+.ui .button {cursor:pointer;}
+.ui .button:hover {box-shadow:0px 3px #C9C9C9;-webkit-transform:translateY(2px);-moz-transform:translateY(2px);-o-transform:translateY(2px);transform:translateY(2px);}
+
+.ui .animated {-webkit-transition:opacity 0.3s;-moz-transition:opacity 0.3s;-o-transition:opacity 0.3s;transition:opacity 0.3s;}
+
+.ui .mask {position:fixed;top:0;left:0;width:100%;height:100%;}
+
+.ui .instructions {position:fixed;left:50%;top:50%;width:700px;margin:-120px 0 0 -310px;text-align:center;}
+.ui .instruction {width:180px;height:180px;margin:10px;float:left;}
+.ui .instruction .num {display:block;padding:30px 0 12px 0;font-size:60px;}
+.ui .instruction .num:after {content:'.';}
+.ui .instruction .illustration {display:inline-block;}
+.ui .instruction .text {display:block;margin:0 20px;line-height:1.2em;}
+
+.ui .play {position:fixed;top:50%;left:50%;width:140px;margin:140px 0 0 -70px;text-align:center;font-size:36px;padding:17px 10px 8px 10px;}
+
+.ui .tweaks {position:fixed;bottom:20px;right:20px;}
+.ui .tweaks > div {margin:10px;cursor:pointer;}
+.ui .tweaks .box {display:inline-block;position:relative;width:24px;height:24px;background:#1E2734;border:4px solid #fff;box-shadow:0px 3px #C9C9C9;}
+.ui .tweaks > div:hover .box {box-shadow:0px 1px #C9C9C9;-webkit-transform:translateY(2px);-moz-transform:translateY(2px);-o-transform:translateY(2px);transform:translateY(2px);}
+.ui .tweaks .active .box:after {content:'';display:block;position:absolute;top:4px;right:4px;bottom:4px;left:4px;background:#fff;}
+.ui .tweaks .label {display:inline-block;position:relative;top:-8px;padding:0 10px 0 10px;}
+
+.ui .replay {display:none;position:fixed;bottom:20px;right:282px;padding:8px 7px 7px 7px;cursor:pointer;font-size:16px;}
+
+.ui .credits {display:none;position:fixed;top:50%;left:50%;width:600px;margin:-140px 0 0 -300px;padding:27px 30px 8px 30px;text-align:center;font-size:16px;line-height:1.4em;}
+.ui .credits > div {margin:10px 10px 20px 10px;}
+.ui .credits-trigger {position:fixed;bottom:20px;right:190px;padding:12px 10px 10px 10px;cursor:pointer;}
+.ui .credits .close {position:absolute;top:-26px;right:-26px;width:46px;height:44px;padding:22px 0 0 2px;text-align:center;font-size:30px;line-height:0;}
+.ui .credits .key {position: relative;top:-1px;display:inline-block;border:1px solid #fff;padding:5px 8px 0px;margin:0 4px;line-height:16px;}
+
+.ui .scores {display:none;position:fixed;top:50%;left:50%;width:400px;margin:-160px 0 0 -200px;padding:27px 30px 22px 30px;text-align:center;font-size:30px;}
+.ui .scores .value {display:inline-block;float:right;}
+.ui .scores .elves,
+.ui .scores .time {text-align:left;padding-bottom:10px;}
+.ui .scores .comment {padding:30px 0;}
+.ui .scores .comment.animated {-webkit-transition:all 0.4s 0.5s ease-in;-moz-transition:all 0.4s 0.5s ease-in;-o-transition:all 0.4s 0.5s ease-in;transition:all 0.4s 0.5s ease-in;opacity:1;}
+.ui .scores .comment.big {-webkit-transform:scale(4) rotate(10deg);-moz-transform:scale(4) rotate(10deg);-o-transform:scale(4) rotate(10deg);transform:scale(4) rotate(10deg);opacity:0;}
+.ui .scores .twitter,
+.ui .scores .facebook {position:absolute;bottom:-26px;left:50%;margin:0 0 0 8px;padding:10px 7px 5px 7px;font-size:26px;text-decoration:none;background:#3D62B3;}
+.ui .scores .twitter {margin:0 0 0 -66px;background:#4099FF;}
+
+.ui .loose {display:none;position:fixed;top:50%;left:50%;width:400px;margin:-40px 0 0 -200px;padding:27px 30px 17px 30px;text-align:center;font-size:30px;}
+
+.ui .time-live  {display:none;position:fixed;top:20px;left:50%;width:80px;margin:0 0 0 -93px;padding:12px 10px 8px 10px;text-align:center;font-size:16px;}
+.ui .elves-live {display:none;position:fixed;top:20px;left:50%;width:80px;margin:0 0 0 13px;padding:12px 10px 8px 10px;text-align:center;font-size:16px;}
+
+.ui .time-live:before,
+.ui .elves-live:before {margin-bottom:6px;margin-top:-4px;}
+
+
