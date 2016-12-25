@@ -22,3 +22,4 @@
 - [particles-morphing](https://bruno-simon.com/lab/work-in-progress/particles-morphing/) ([source](work-in-progress/particles-morphing/))
 - [retro-css-animations](https://bruno-simon.com/lab/work-in-progress/retro-css-animations/) ([source](work-in-progress/retro-css-animations/))
 - [vault](https://bruno-simon.com/lab/work-in-progress/vault/) ([source](work-in-progress/vault/))
+- [collision-first-person-shooter](https://bruno-simon.com/lab/work-in-progress/collision-first-person-shooter/) ([source](work-in-progress/collision-first-person-shooter/))
