@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { EffectComposer, RenderPass, BloomPass } from 'postprocessing'
 
 import Time from './Time.js'
 import Sizes from './Sizes.js'
@@ -74,15 +75,29 @@ export default class Application
 
     setRenderer()
     {
+        // Renderer
         this.renderer = new THREE.WebGLRenderer()
         this.renderer.setClearColor(0x0a0720)
         this.renderer.domElement.classList.add('main')
         document.body.appendChild(this.renderer.domElement)
 
+        // Composer
+        this.composer = new EffectComposer(this.renderer)
+
+        // Render pass
+        const renderPass = new RenderPass(this.scene, this.camera)
+        this.composer.addPass(renderPass)
+
+        // Bloom pass
+        const bloomPass = new BloomPass({ intensity: 2 })
+        bloomPass.renderToScreen = true
+        this.composer.addPass(bloomPass)
+
         // Resize
         const resize = () =>
         {
             this.renderer.setSize(this.sizes.width, this.sizes.height)
+            this.composer.setSize(this.sizes.width, this.sizes.height)
         }
         this.sizes.on('resize', resize)
         resize()
@@ -90,7 +105,8 @@ export default class Application
         // Tick
         this.time.on('tick', () =>
         {
-            this.renderer.render(this.scene, this.camera)
+            // this.renderer.render(this.scene, this.camera)
+            this.composer.render()
         })
     }
 }
