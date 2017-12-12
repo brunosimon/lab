@@ -56,7 +56,7 @@ export default class Beams
         this.items = []
         // this.beams.material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
 
-        for(let i = 0; i < 18; i++)
+        for(let i = 0; i < 25; i++)
         {
             const material = this.getMaterial()
 
