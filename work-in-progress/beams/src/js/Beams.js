@@ -12,7 +12,42 @@ export default class Beams
 
         this.time = _options.time
 
+        this.setGradient()
         this.setItems()
+    }
+
+    setGradient()
+    {
+        this.gradient = {}
+
+        // Canvas
+        this.gradient.canvas = document.createElement('canvas')
+        this.gradient.canvas.width = 128
+        this.gradient.canvas.height = 1
+
+        // Context
+        this.gradient.context = this.gradient.canvas.getContext('2d')
+
+        const gradientStyle = this.gradient.context.createLinearGradient(0, 0, this.gradient.canvas.width, 0)
+        const colorStops = [
+            '#0a0720',
+            // '#260918',
+            // '#7f152b',
+            '#9b2222',
+            '#3e2675',
+            '#efe7f3'
+        ]
+        for(const colorStopsKey in colorStops)
+        {
+            gradientStyle.addColorStop(colorStopsKey / colorStops.length, colorStops[colorStopsKey])
+        }
+
+        this.gradient.context.fillStyle = gradientStyle
+        this.gradient.context.fillRect(0, 0, this.gradient.canvas.width, this.gradient.canvas.height)
+
+        // texture
+        this.gradient.texture = new THREE.Texture(this.gradient.canvas)
+        this.gradient.texture.needsUpdate = true
     }
 
     setItems()
@@ -21,16 +56,16 @@ export default class Beams
         this.items = []
         // this.beams.material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
 
-        for(let i = 0; i < 8; i++)
+        for(let i = 0; i < 18; i++)
         {
             const material = this.getMaterial()
 
             const mesh = new THREE.Mesh(this.geometry, material)
-            mesh.position.x = (Math.random() - 0.5) * 1
-            mesh.position.y = (Math.random() - 0.5) * 1
-            mesh.position.z = (Math.random() - 0.5) * 1
-            mesh.scale.x = 0.3
-            mesh.scale.y = 5
+            mesh.position.x = (Math.random() - 0.5) * 3
+            mesh.position.y = (Math.random() - 0.5) * 3
+            mesh.position.z = (Math.random() - 0.5) * 3
+            mesh.scale.x = 0.2 + Math.random() * 0.3
+            mesh.scale.y = 10
 
             this.container.add(mesh)
 
@@ -45,7 +80,7 @@ export default class Beams
             }
         })
     }
-    
+
     getMaterial()
     {
         return new THREE.ShaderMaterial({
@@ -54,6 +89,7 @@ export default class Beams
             uniforms:
             {
                 uTime: { type: 'f', value: 0.0 },
+                uGradient: { type: 't', value: this.gradient.texture },
                 uRandomSeed: { type: 'f', value: Math.random() },
             },
             transparent: true,

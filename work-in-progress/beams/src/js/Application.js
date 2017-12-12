@@ -26,16 +26,6 @@ export default class Application
         this.camera.position.z = 1
         this.scene.add(this.camera)
 
-        window.addEventListener('mousemove', (event) =>
-        {
-            this.camera.position.z = event.clientY / this.sizes.height
-            this.camera.position.x = (event.clientX / this.sizes.width) - 0.5
-        })
-
-        // // Dummy
-        // this.dummy = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1, 1, 1, 1), new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true }))
-        // this.scene.add(this.dummy)
-
         // Resize
         this.sizes.on('resize', () =>
         {
@@ -55,6 +45,7 @@ export default class Application
     setRenderer()
     {
         this.renderer = new THREE.WebGLRenderer()
+        this.renderer.setClearColor(0x0a0720)
         this.renderer.domElement.classList.add('main')
         document.body.appendChild(this.renderer.domElement)
 
