@@ -5,6 +5,8 @@ import Time from './Time.js'
 import Sizes from './Sizes.js'
 import Beams from './Beams.js'
 
+import { NoisePass } from './passes/noise/'
+
 export default class Application
 {
     constructor()
@@ -86,12 +88,18 @@ export default class Application
 
         // Render pass
         const renderPass = new RenderPass(this.scene, this.camera)
+        renderPass.renderToScreen = false
         this.composer.addPass(renderPass)
 
         // Bloom pass
         const bloomPass = new BloomPass({ intensity: 2 })
-        bloomPass.renderToScreen = true
+        bloomPass.renderToScreen = false
         this.composer.addPass(bloomPass)
+
+        // Noise pass
+        const noisePass = new NoisePass()
+        noisePass.renderToScreen = true
+        this.composer.addPass(noisePass)
 
         // Resize
         const resize = () =>

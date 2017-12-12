@@ -1,8 +1,8 @@
 import * as THREE from 'three'
 
-import beamVertexShader from '../shaders/beam/vertex.glsl'
-import beamFragmentShader from '../shaders/beam/fragment.glsl'
-import cnoise3dShader from '../shaders/noises/cnoise3d.glsl'
+import beamVertexShader from './shaders/beam/vertex.glsl'
+import beamFragmentShader from './shaders/beam/fragment.glsl'
+import cnoise3dShader from './shaders/noises/cnoise3d.glsl'
 
 export default class Beams
 {
