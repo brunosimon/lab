@@ -56,7 +56,8 @@ export default class Beams
                 uTime: { type: 'f', value: 0.0 },
                 uRandomSeed: { type: 'f', value: Math.random() },
             },
-            transparent: true
+            transparent: true,
+            blending: THREE.AdditiveBlending
         })
     }
 }
