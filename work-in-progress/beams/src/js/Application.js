@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import { EffectComposer, RenderPass, BloomPass } from 'postprocessing'
+import { EffectComposer, RenderPass, BloomPass, BlurPass, SavePass, ShaderPass, CombineMaterial } from 'postprocessing'
+import ControlKit from 'controlkit'
 
 import Time from './Time.js'
 import Sizes from './Sizes.js'
@@ -14,10 +15,17 @@ export default class Application
         this.time = new Time()
         this.sizes = new Sizes()
 
+        this.setControlKit()
         this.setCursor()
         this.setScene()
         this.setBeams()
         this.setRenderer()
+    }
+
+    setControlKit()
+    {
+        this.controlKit = new ControlKit()
+        this.controlKit.addPanel({ width: 300 })
     }
 
     setCursor()
@@ -70,16 +78,19 @@ export default class Application
     setBeams()
     {
         this.beams = new Beams({
-            time: this.time
+            time: this.time,
+            controlKit: this.controlKit
         })
         this.scene.add(this.beams.container)
     }
 
     setRenderer()
     {
+        this.clearColor = '#0a0720'
+
         // Renderer
         this.renderer = new THREE.WebGLRenderer()
-        this.renderer.setClearColor(0x0a0720)
+        this.renderer.setClearColor(this.clearColor)
         this.renderer.domElement.classList.add('main')
         document.body.appendChild(this.renderer.domElement)
 
@@ -95,6 +106,23 @@ export default class Application
         const bloomPass = new BloomPass({ intensity: 2 })
         bloomPass.renderToScreen = false
         this.composer.addPass(bloomPass)
+
+        // Save pass
+        const savePass = new SavePass()
+        savePass.renderToScreen = false
+        this.composer.addPass(savePass)
+
+        // Blur pass
+        const blurPass = new BlurPass({})
+        blurPass.renderToScreen = false
+        this.composer.addPass(blurPass)
+
+        // Combine pass (to fade between normal and blur pass)
+        const combinePass = new ShaderPass(new CombineMaterial(), 'texture1')
+        combinePass.material.uniforms.texture2.value = savePass.renderTarget.texture;
+        combinePass.material.uniforms.opacity1.value = 0.0;
+        combinePass.material.uniforms.opacity2.value = 1.0;
+        this.composer.addPass(combinePass)
 
         // Noise pass
         const noisePass = new NoisePass()
@@ -121,5 +149,28 @@ export default class Application
             // this.renderer.render(this.scene, this.camera)
             this.composer.render()
         })
+
+        // Controlkit
+        const group = this.controlKit._panels[0].addGroup({
+            label: 'Render',
+            enable: true
+        })
+
+        const onRenderChange = () =>
+        {
+            this.renderer.setClearColor(this.clearColor)
+
+            combinePass.material.uniforms.opacity2.value = 1.0 - combinePass.material.uniforms.opacity1.value
+
+            this.composer.setSize()
+        }
+
+        group.addColor(this, 'clearColor', { label: 'clear color', colorMode: 'hex', onChange: onRenderChange })
+        group.addNumberInput(noisePass.material.uniforms.uStrength, 'value', { label: 'noise strength', step: 0.01 })
+        group.addNumberInput(bloomPass, 'intensity', { label: 'bloom intensity', step: 0.1 })
+        group.addNumberInput(bloomPass, 'distinction', { label: 'bloom distinction', step: 0.1 })
+        group.addNumberInput(blurPass, 'resolutionScale', { label: 'blur scale', step: 0.1, onChange: onRenderChange })
+        group.addNumberInput(blurPass, 'kernelSize', { label: 'blur kernel size', step: 1 })
+        group.addNumberInput(combinePass.material.uniforms.opacity1, 'value', { label: 'blur intensity', step: 0.1, onChange: onRenderChange })
     }
 }

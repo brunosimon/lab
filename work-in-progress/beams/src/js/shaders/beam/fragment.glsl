@@ -1,5 +1,7 @@
 uniform float uTime;
 uniform float uRandomSeed;
+uniform float uPerlinSpeed;
+uniform vec2 uPerlinScale;
 uniform sampler2D uGradient;
 
 varying vec2 vUv;
@@ -11,8 +13,8 @@ void main()
     // Noise
     float noiseTime = uTime + uRandomSeed * 100000.0;
 
-    float noiseA = (cnoise(vec3(vUv.x * 10.0, vUv.y * 0.2 - noiseTime * 0.0005, 0.0)) + 0.5) * 1.0;
-    float noiseB = (cnoise(vec3(vUv.x * 100.0, vUv.y * 2.0 - noiseTime * 0.0005, 0.0)) + 0.5) * 1.0;
+    float noiseA = (cnoise(vec3(vUv.x * uPerlinScale.x * 10.0, vUv.y * uPerlinScale.y * 10.0 - noiseTime * 0.005 * uPerlinSpeed, 0.0)) + 0.5) * 1.0;
+    float noiseB = (cnoise(vec3(vUv.x * uPerlinScale.x * 100.0, vUv.y * uPerlinScale.y * 100.0 - noiseTime * 0.005 * uPerlinSpeed, 0.0)) + 0.5) * 1.0;
 
     float limit = 0.25;
 
