@@ -31,11 +31,11 @@ export default class Application
     setCursor()
     {
         this.cursor = {}
-        this.cursor.x = 0
-        this.cursor.y = 0
+        this.cursor.x = 0.5
+        this.cursor.y = 0.5
         this.cursor.target = {}
-        this.cursor.target.x = 0
-        this.cursor.target.y = 0
+        this.cursor.target.x = 0.5
+        this.cursor.target.y = 0.5
 
         window.addEventListener('mousemove', (event) =>
         {
@@ -57,7 +57,7 @@ export default class Application
 
         // Camera
         this.camera = new THREE.PerspectiveCamera(75, this.sizes.width / this.sizes.height, 0.1, 1000)
-        this.camera.position.z = 1
+        this.camera.position.z = 0
         this.scene.add(this.camera)
 
         // Resize
@@ -70,8 +70,16 @@ export default class Application
         // Time tick
         this.time.on('tick', () =>
         {
-            this.camera.position.z = this.cursor.y / this.sizes.width
-            this.camera.position.x = this.cursor.x / this.sizes.height - 0.5
+            const positionX = this.cursor.x / this.sizes.height - 0.5
+
+            let speed = positionX - this.camera.position.x
+            speed = Math.max(speed, - 0.02)
+            speed = Math.min(speed, 0.02)
+
+            const rotation = - speed * 5
+            
+            this.camera.position.x = positionX
+            this.camera.rotation.z += (rotation - this.camera.rotation.z) * 0.01 * this.time.delta
         })
     }
 
@@ -107,22 +115,22 @@ export default class Application
         bloomPass.renderToScreen = false
         this.composer.addPass(bloomPass)
 
-        // Save pass
-        const savePass = new SavePass()
-        savePass.renderToScreen = false
-        this.composer.addPass(savePass)
+        // // Save pass
+        // const savePass = new SavePass()
+        // savePass.renderToScreen = false
+        // this.composer.addPass(savePass)
 
-        // Blur pass
-        const blurPass = new BlurPass({})
-        blurPass.renderToScreen = false
-        this.composer.addPass(blurPass)
+        // // Blur pass
+        // const blurPass = new BlurPass({})
+        // blurPass.renderToScreen = false
+        // this.composer.addPass(blurPass)
 
-        // Combine pass (to fade between normal and blur pass)
-        const combinePass = new ShaderPass(new CombineMaterial(), 'texture1')
-        combinePass.material.uniforms.texture2.value = savePass.renderTarget.texture;
-        combinePass.material.uniforms.opacity1.value = 0.0;
-        combinePass.material.uniforms.opacity2.value = 1.0;
-        this.composer.addPass(combinePass)
+        // // Combine pass (to fade between normal and blur pass)
+        // const combinePass = new ShaderPass(new CombineMaterial(), 'texture1')
+        // combinePass.material.uniforms.texture2.value = savePass.renderTarget.texture;
+        // combinePass.material.uniforms.opacity1.value = 0.0;
+        // combinePass.material.uniforms.opacity2.value = 1.0;
+        // this.composer.addPass(combinePass)
 
         // Noise pass
         const noisePass = new NoisePass()
@@ -153,7 +161,7 @@ export default class Application
         // Controlkit
         const group = this.controlKit._panels[0].addGroup({
             label: 'Render',
-            enable: true
+            enable: false
         })
 
         const onRenderChange = () =>
@@ -169,8 +177,8 @@ export default class Application
         group.addNumberInput(noisePass.material.uniforms.uStrength, 'value', { label: 'noise strength', step: 0.01 })
         group.addNumberInput(bloomPass, 'intensity', { label: 'bloom intensity', step: 0.1 })
         group.addNumberInput(bloomPass, 'distinction', { label: 'bloom distinction', step: 0.1 })
-        group.addNumberInput(blurPass, 'resolutionScale', { label: 'blur scale', step: 0.1, onChange: onRenderChange })
-        group.addNumberInput(blurPass, 'kernelSize', { label: 'blur kernel size', step: 1 })
-        group.addNumberInput(combinePass.material.uniforms.opacity1, 'value', { label: 'blur intensity', step: 0.1, onChange: onRenderChange })
+        // group.addNumberInput(blurPass, 'resolutionScale', { label: 'blur scale', step: 0.1, onChange: onRenderChange })
+        // group.addNumberInput(blurPass, 'kernelSize', { label: 'blur kernel size', step: 1 })
+        // group.addNumberInput(combinePass.material.uniforms.opacity1, 'value', { label: 'blur intensity', step: 0.1, onChange: onRenderChange })
     }
 }

@@ -32,6 +32,11 @@ export default class Time extends EventEmitter
         this.elapsed = current - this.start
         this.current = current
 
+        if(this.delta > 60)
+        {
+            this.delta = 60
+        }
+
         this.lastTick = current
         this.trigger('tick')
     }
