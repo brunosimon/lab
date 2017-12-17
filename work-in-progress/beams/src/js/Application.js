@@ -101,6 +101,11 @@ export default class Application
         noisePass.renderToScreen = true
         this.composer.addPass(noisePass)
 
+        this.time.on('tick', () =>
+        {
+            noisePass.material.uniforms.uRandom.value = Math.random()
+        })
+
         // Resize
         const resize = () =>
         {

@@ -1,21 +1,8 @@
 uniform sampler2D tDiffuse;
-
-uniform float angle;
-uniform float scale;
-uniform float intensity;
+uniform float uStrength;
+uniform float uRandom;
 
 varying vec2 vUv;
-varying vec2 vUvPattern;
-
-// float pattern()
-// {
-//     float s = sin(angle);
-//     float c = cos(angle);
-
-//     vec2 point = vec2(c * vUvPattern.x - s * vUvPattern.y, s * vUvPattern.x + c * vUvPattern.y) * scale;
-
-//     return (sin(point.x) * sin(point.y)) * 4.0;
-// }
 
 float rand(vec2 co)
 {
@@ -24,19 +11,11 @@ float rand(vec2 co)
 
 void main()
 {
-    vec4 texel = texture2D(tDiffuse, vUv);
-    vec3 color = texel.rgb;
+    vec4 color = texture2D(tDiffuse, vUv);
 
-    // #ifdef AVERAGE
+    color.r += (rand(vUv + vec2(uRandom) + vec2(0.0)) - 0.5) * uStrength;
+    color.g += (rand(vUv + vec2(uRandom) + vec2(1.0)) - 0.5) * uStrength;
+    color.b += (rand(vUv + vec2(uRandom) + vec2(3.0)) - 0.5) * uStrength;
 
-    //     color = vec3((color.r + color.g + color.b) / 3.0);
-
-    // #endif
-
-    // color = vec3(color * 10.0 - 5.0 + pattern());
-    // color = texel.rgb + (color - texel.rgb) * intensity;
-
-    color.rgb += (rand(vUv) - 0.5) * 0.05;
-
-    gl_FragColor = vec4(color, texel.a);
+    gl_FragColor = color;
 }

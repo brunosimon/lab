@@ -21,10 +21,7 @@ export class NoisePass extends Pass
 
     setSize(width, height)
     {
-        width = Math.max(1, width);
-        height = Math.max(1, height);
-
-        this.material.uniforms.offsetRepeat.value.z = width;
-        this.material.uniforms.offsetRepeat.value.w = height;
+        width = Math.max(1, width)
+        height = Math.max(1, height)
     }
 }
