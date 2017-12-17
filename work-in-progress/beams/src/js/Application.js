@@ -86,7 +86,7 @@ export default class Application
 
     setRenderer()
     {
-        this.clearColor = '#0a0720'
+        this.clearColor = '#110217'
 
         // Renderer
         this.renderer = new THREE.WebGLRenderer()

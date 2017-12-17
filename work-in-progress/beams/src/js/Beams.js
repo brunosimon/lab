@@ -34,12 +34,10 @@ export default class Beams
 
         // Colors
         const colors = [
-            '#0a0720',
-            // '#260918',
-            // '#7f152b',
-            '#9b2222',
-            '#3e2675',
-            '#efe7f3'
+            '#24151c',
+            '#ba235b',
+            '#ffab36',
+            '#ffedde'
         ]
 
         // Controlkit
