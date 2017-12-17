@@ -3,6 +3,7 @@ uniform float uRandomSeed;
 uniform float uPerlinSpeed;
 uniform vec2 uPerlinScale;
 uniform sampler2D uGradient;
+uniform float uAlpha;
 
 varying vec2 vUv;
 
@@ -29,7 +30,7 @@ void main()
     color.rgb = vec3(texture2D(uGradient, vec2(gradientX, 0.0)));
 
     // Alpha
-    color.a = noiseFinal;
+    color.a = clamp(noiseFinal, 0.0, 1.0) * uAlpha;
 
     // Test
     // color.rgb = vec3(noiseFinal);

@@ -12,6 +12,10 @@ export default class Beams
 
         this.time = _options.time
         this.controlKit = _options.controlKit
+        
+        this.range = {}
+        this.range.x = { start: - 1.5, amplitude: 5 }
+        this.range.z = { start: - 0.5, amplitude: - 3, fadeAmplitude: 0.75 }
 
         this.setGradient()
         this.setItems()
@@ -67,28 +71,32 @@ export default class Beams
         group.addColor(colors, '3', { label: 'step 3', colorMode: 'hex', onChange: onColorsChange })
     }
 
+    /**
+     * Set items
+     */
     setItems()
     {
+        this.count = 25
+
         this.scale = {}
         this.scale.value = 0.2
         this.scale.random = 0.3
 
         this.perlin = {}
-        this.perlin.scale = [1.0, 0.02]
+        this.perlin.scale = [0.4, 0.02]
         this.perlin.speed = 0.1
 
         this.geometry = new THREE.PlaneBufferGeometry(1, 1, 1, 1)
         this.items = []
         // this.beams.material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
 
-        for(let i = 0; i < 25; i++)
+        for(let i = 0; i < this.count; i++)
         {
             const material = this.getMaterial()
 
             const mesh = new THREE.Mesh(this.geometry, material)
-            mesh.position.x = (Math.random() - 0.5) * 3
-            mesh.position.y = (Math.random() - 0.5) * 3
-            mesh.position.z = (Math.random() - 0.5) * 3
+            mesh.position.x = this.range.x.start + this.range.x.amplitude * Math.random()
+            mesh.position.z = this.range.z.start + this.range.z.amplitude * Math.random()
             mesh.scale.y = 10
 
             this.container.add(mesh)
@@ -99,9 +107,35 @@ export default class Beams
         // Time tick
         this.time.on('tick', () =>
         {
+            // Each mesh
             for(const mesh of this.items)
             {
                 mesh.material.uniforms.uTime.value = this.time.elapsed
+
+                mesh.position.z += this.time.delta * 0.0002
+
+                // Reset position
+                if(mesh.position.z > this.range.z.start)
+                {
+                    mesh.position.x = this.range.x.start + this.range.x.amplitude * Math.random()
+                    mesh.position.z = this.range.z.start + this.range.z.amplitude
+                }
+
+                // Alpha depending on position
+                let alpha = 1.0
+                const distanceToEnd = Math.abs(mesh.position.z - this.range.z.start)
+                if(distanceToEnd < this.range.z.fadeAmplitude)
+                {
+                    alpha = distanceToEnd / this.range.z.fadeAmplitude
+                }
+                
+                const distanceToStart = Math.abs(mesh.position.z - this.range.z.amplitude - this.range.z.start)
+                if(distanceToStart < this.range.z.fadeAmplitude)
+                {
+                    alpha = distanceToStart / this.range.z.fadeAmplitude
+                }
+
+                mesh.material.uniforms.uAlpha.value = alpha
             }
         })
 
@@ -154,7 +188,8 @@ export default class Beams
                 uGradient: { type: 't', value: this.gradient.texture },
                 uRandomSeed: { type: 'f', value: Math.random() },
                 uPerlinSpeed: { type: 'f', value: this.perlin.speed },
-                uPerlinScale: { type: 'v2', value: this.perlin.scale }
+                uPerlinScale: { type: 'v2', value: this.perlin.scale },
+                uAlpha: { type: 'f' , value: 1 }
             },
             transparent: true,
             blending: THREE.AdditiveBlending
