@@ -126,22 +126,53 @@ export default class Application
         bloomPass.renderToScreen = false
         this.composer.addPass(bloomPass)
 
-        // // Save pass
-        // const savePass = new SavePass()
-        // savePass.renderToScreen = false
-        // this.composer.addPass(savePass)
+        // Save pass
+        const savePass = new SavePass()
+        savePass.renderToScreen = false
+        this.composer.addPass(savePass)
 
-        // // Blur pass
-        // const blurPass = new BlurPass({})
-        // blurPass.renderToScreen = false
-        // this.composer.addPass(blurPass)
+        // Blur pass
+        const blurPass = new BlurPass({
+            resolutionScale: 1.2
+        })
+        blurPass.renderToScreen = false
+        this.composer.addPass(blurPass)
 
-        // // Combine pass (to fade between normal and blur pass)
-        // const combinePass = new ShaderPass(new CombineMaterial(), 'texture1')
-        // combinePass.material.uniforms.texture2.value = savePass.renderTarget.texture;
-        // combinePass.material.uniforms.opacity1.value = 0.0;
-        // combinePass.material.uniforms.opacity2.value = 1.0;
-        // this.composer.addPass(combinePass)
+        // Combine pass (to fade between normal and blur pass)
+        const combinePass = new ShaderPass(new CombineMaterial(), 'texture1')
+        combinePass.material.uniforms.texture2.value = savePass.renderTarget.texture;
+        combinePass.material.uniforms.opacity1.value = 0.0;
+        combinePass.material.uniforms.opacity2.value = 1.0;
+        this.composer.addPass(combinePass)
+        const combineOptions = {}
+        combineOptions.target = 0
+        combineOptions.value = 0
+        combineOptions.active = true
+
+        this.time.on('tick', () =>
+        {
+            if(combineOptions.active)
+            {
+                if(Math.sin(this.time.elapsed * 0.001) * Math.sin(this.time.elapsed * 0.0023) * Math.sin(this.time.elapsed * 0.00654) > 0.2)
+                {
+                    combineOptions.target = 1
+                }
+                else
+                {
+                    combineOptions.target = 0
+                }
+
+                combineOptions.value += (combineOptions.target - combinePass.material.uniforms.opacity1.value) * 0.01 * this.time.delta
+
+                combinePass.material.uniforms.opacity1.value = Math.round(combineOptions.value * 100) / 100
+                combinePass.material.uniforms.opacity2.value = 1 - combinePass.material.uniforms.opacity1.value
+            }
+            else
+            {
+                combinePass.material.uniforms.opacity1.value = 0
+                combinePass.material.uniforms.opacity2.value = 1 - combinePass.material.uniforms.opacity1.value
+            }
+        })
 
         // Noise pass
         const noisePass = new NoisePass()
@@ -185,11 +216,15 @@ export default class Application
         }
 
         group.addColor(this, 'clearColor', { label: 'clear color', colorMode: 'hex', onChange: onRenderChange })
+        
         group.addNumberInput(noisePass.material.uniforms.uStrength, 'value', { label: 'noise strength', step: 0.01 })
+        
         group.addNumberInput(bloomPass, 'intensity', { label: 'bloom intensity', step: 0.1 })
         group.addNumberInput(bloomPass, 'distinction', { label: 'bloom distinction', step: 0.1 })
-        // group.addNumberInput(blurPass, 'resolutionScale', { label: 'blur scale', step: 0.1, onChange: onRenderChange })
-        // group.addNumberInput(blurPass, 'kernelSize', { label: 'blur kernel size', step: 1 })
-        // group.addNumberInput(combinePass.material.uniforms.opacity1, 'value', { label: 'blur intensity', step: 0.1, onChange: onRenderChange })
+
+        group.addCheckbox(combineOptions, 'active', { label: 'blur active' })
+        group.addNumberInput(blurPass, 'resolutionScale', { label: 'blur scale', step: 0.1, onChange: onRenderChange })
+        group.addNumberInput(blurPass, 'kernelSize', { label: 'blur kernel size', step: 1 })
+        group.addNumberInput(combinePass.material.uniforms.opacity1, 'value', { label: 'blur intensity', step: 0.1, onChange: onRenderChange })
     }
 }
