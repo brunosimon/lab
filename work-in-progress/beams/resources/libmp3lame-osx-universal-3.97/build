@@ -1,0 +1,49 @@
+#!/bin/sh
+
+if [ ! -f lame.spec.in ]
+then
+   echo "You must be in the top level directory of the lame 3.97 source tree"
+   exit 1
+fi
+
+export MACOSX_DEPLOYMENT_TARGET=10.2
+export NEXT_ROOT="/Developer/SDKs/MacOSX10.2.8.sdk"
+export C_INCLUDE_PATH="/Developer/SDKs/MacOSX10.2.8.sdk/usr/include"
+export LIBRARY_PATH="/Developer/SDKs/MacOSX10.2.8.sdk/usr/lib/gcc/darwin/3.3"
+export LD_PREBIND=1
+export CPPFLAGS='-DMAC_OS_X_VERSION_MAX_ALLOWED=1020'
+export CFLAGS='-DMAC_OS_X_VERSION_MAX_ALLOWED=1020'
+
+echo "Enter your password to select gcc 3.3 compiler"
+sudo gcc_select 3.3
+
+./configure --disable-frontend --enable-static=no --disable-dependency-tracking
+cd mpglib
+make CFLAGS='-DMAC_OS_X_VERSION_MAX_ALLOWED=1020' LDFLAGS='"-Wc,--undefined_dynamic_lookup"' LIBTOOL=glibtool
+cd ../libmp3lame
+make CFLAGS='-DMAC_OS_X_VERSION_MAX_ALLOWED=1020' LDFLAGS='"-Wc,--undefined_dynamic_lookup"' LIBTOOL=glibtool
+cp -p .libs/libmp3lame.0.0.0.dylib /tmp/libmp3lame.dylib
+cd ..
+make distclean
+
+unset MACOSX_DEPLOYMENT_TARGET
+unset NEXT_ROOT
+unset C_INCLUDE_PATH
+unset LIBRARY_PATH
+unset LD_PREBIND
+unset CPPFLAGS
+unset CFLAGS
+
+echo "Enter your password to select gcc 4.0 compiler"
+sudo gcc_select 4.0
+
+./configure --disable-frontend --enable-static=no --disable-dependency-tracking
+cd mpglib
+make CFLAGS='-arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk' LDFLAGS='"-Wc,-isysroot/Developer/SDKs/MacOSX10.4u.sdk" "-Wc,--undefined_dynamic_lookup"' LIBTOOL=glibtool
+cd ../libmp3lame
+make CFLAGS='-arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk' LDFLAGS='"-Wc,-isysroot/Developer/SDKs/MacOSX10.4u.sdk" "-Wc,--undefined_dynamic_lookup"' LIBTOOL=glibtool
+
+lipo -output ../libmp3lame.dylib -create /tmp/libmp3lame.dylib .libs/libmp3lame.0.0.0.dylib
+rm /tmp/libmp3lame.dylib
+
+make distclean

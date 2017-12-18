@@ -17,6 +17,7 @@ export default class Application
         this.sizes = new Sizes()
 
         this.setControlKit()
+        this.setAmbiantSound()
         this.setCursor()
         this.setScene()
         this.setBeams()
@@ -27,7 +28,23 @@ export default class Application
     setControlKit()
     {
         this.controlKit = new ControlKit()
-        this.controlKit.addPanel({ width: 300 })
+        this.controlKit.addPanel({ width: 300, enable: false })
+    }
+
+    setAmbiantSound()
+    {
+        this.ambiantSound = document.createElement('audio')
+        this.ambiantSound.loop = true
+        this.ambiantSound.autoplay = true
+        this.ambiantSound.volume = 0.7
+        this.ambiantSound.src = '/static/audio/ambiant.mp3'
+
+        // Controlkit
+        const group = this.controlKit._panels[0].addGroup({
+            label: 'Audio',
+            enable: false
+        })
+        group.addNumberInput(this.ambiantSound, 'volume', { step: 0.01 })
     }
 
     setCursor()
