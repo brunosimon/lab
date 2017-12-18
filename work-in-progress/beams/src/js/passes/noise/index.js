@@ -1,4 +1,5 @@
 import { Pass } from '../Pass.js'
+// import { Pass } from 'postprocessing'
 import Material from './Material.js'
 
 export class NoisePass extends Pass
