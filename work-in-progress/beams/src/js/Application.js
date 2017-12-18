@@ -5,6 +5,7 @@ import ControlKit from 'controlkit'
 import Time from './Time.js'
 import Sizes from './Sizes.js'
 import Beams from './Beams.js'
+import Glows from './Glows.js'
 
 import { NoisePass } from './passes/noise/'
 
@@ -19,6 +20,7 @@ export default class Application
         this.setCursor()
         this.setScene()
         this.setBeams()
+        this.setGlows()
         this.setRenderer()
     }
 
@@ -90,6 +92,15 @@ export default class Application
             controlKit: this.controlKit
         })
         this.scene.add(this.beams.container)
+    }
+
+    setGlows()
+    {
+        this.glows = new Glows({
+            time: this.time,
+            controlKit: this.controlKit
+        })
+        this.scene.add(this.glows.container)
     }
 
     setRenderer()
