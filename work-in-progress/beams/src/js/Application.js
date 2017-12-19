@@ -164,6 +164,7 @@ export default class Application
         const combineOptions = {}
         combineOptions.target = 0
         combineOptions.value = 0
+        combineOptions.alpha = 1
         combineOptions.active = true
 
         this.time.on('tick', () =>
@@ -181,14 +182,14 @@ export default class Application
 
                 combineOptions.value += (combineOptions.target - combinePass.material.uniforms.opacity1.value) * 0.01 * this.time.delta
 
-                combinePass.material.uniforms.opacity1.value = Math.round(combineOptions.value * 100) / 100
-                combinePass.material.uniforms.opacity2.value = 1 - combinePass.material.uniforms.opacity1.value
+                combinePass.material.uniforms.opacity1.value = (Math.round(combineOptions.value * 100) / 100) * combineOptions.alpha
             }
             else
             {
                 combinePass.material.uniforms.opacity1.value = 0
-                combinePass.material.uniforms.opacity2.value = 1 - combinePass.material.uniforms.opacity1.value
             }
+
+            combinePass.material.uniforms.opacity2.value = 1 - combinePass.material.uniforms.opacity1.value
         })
 
         // Noise pass
@@ -242,6 +243,6 @@ export default class Application
         group.addCheckbox(combineOptions, 'active', { label: 'blur active' })
         group.addNumberInput(blurPass, 'resolutionScale', { label: 'blur scale', step: 0.1, onChange: onRenderChange })
         group.addNumberInput(blurPass, 'kernelSize', { label: 'blur kernel size', step: 1 })
-        group.addNumberInput(combinePass.material.uniforms.opacity1, 'value', { label: 'blur intensity', step: 0.1, onChange: onRenderChange })
+        group.addNumberInput(combineOptions, 'alpha', { label: 'blur intensity', step: 0.1, onChange: onRenderChange })
     }
 }
