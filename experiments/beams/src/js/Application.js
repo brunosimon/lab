@@ -37,7 +37,7 @@ export default class Application
         this.ambiantSound.loop = true
         this.ambiantSound.autoplay = true
         this.ambiantSound.volume = 0.7
-        this.ambiantSound.src = '/static/audio/ambiant.mp3'
+        this.ambiantSound.src = 'static/audio/ambiant.mp3'
 
         // Controlkit
         const group = this.controlKit._panels[0].addGroup({
