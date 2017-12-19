@@ -2,6 +2,7 @@
 
 ### Experiments
 
+- [beams](https://bruno-simon.com/lab/experiments/beams/) ([source](experiments/beams/))
 - [particles-painting](https://bruno-simon.com/lab/experiments/particles-painting/) ([source](experiments/particles-painting/))
 - [css3-boxes](https://bruno-simon.com/lab/experiments/css3-boxes/) ([source](experiments/css3-boxes/))
 - [music-spinners](https://bruno-simon.com/lab/experiments/music-spinners/) ([source](experiments/music-spinners/))
